@@ -89,6 +89,7 @@ const newUser = async (req, res) => {
             const UserData = new User(req.body);
             UserData.save().then(data => {
                 if (!req.body.isAdmin) {
+    
                     sendSMS(Math.round(otpnumber), `${req.body.country_code}${data.phone}`)
                 }
                 return res.status(201).send({ success: true, message: 'Data saved.', data: data });
@@ -105,7 +106,7 @@ const newUser = async (req, res) => {
     }
 }
 
-const otpValidator = async (req, res) => {
+const   otpValidator = async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.params.id, otp: req.body.otp });
         if (user) {
@@ -128,8 +129,10 @@ const otpValidator = async (req, res) => {
 }
 
 const login = async (req, res) => {
+    console.log(req.body)
     try {
         const user = await User.findOne({ phone: req.body.phone, status: "ACTIVE", isAdmin: false });
+        console.log(user)
         if (!user) {
             return res.status(500).send({ success: false, message: 'User not found.' });
         } else if (user && bcrypt.compareSync(req.body.password, user.passwordHash)) {
@@ -209,11 +212,11 @@ const generateOTP = async (req, res) => {
 
 const getUserAnalytics = async (req, res) => {
     console.log('hi')
-    // await User.find().then(UserCount => {
-    //     res.status(201).send({success: true, message: '', total_users: UserCount});
-    // }).catch(err => {
-    //     res.status(500).send({success: false, error: err})
-    // })
+    await User.find().then(UserCount => {
+        res.status(201).send({success: true, message: '', total_users: UserCount.length});
+    }).catch(err => {
+        res.status(500).send({success: false, error: err})
+    })
 }
 
 const deleteUser = async (req, res) => {

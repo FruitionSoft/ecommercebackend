@@ -25,7 +25,7 @@ const { mascelinous } = require("./src/Constants/mascelinous");
 const { newSize, getSizeList, getSizeById, editSize, deleteSize } = require("./src/Size/controller");
 const { newBusinessData, getShopList, deleteShop, getShopById, updateShop } = require("./src/BusinessData/controller");
 const { addNewChat, ChatList, updateChat } = require("./src/chat/controller");
-const { addNewMainCategory, getMainCategoryList, editMainCategory } = require("./src/MainCategory/controller");
+const { addNewMainCategory, getMainCategoryList, editMainCategory,deleteMainCategory } = require("./src/MainCategory/controller");
 app.use(bodyParser.json({ limit: '50mb', type: 'application/json' }));
 const { uploadProduct } = require('./services/multer');
 //Bank API
@@ -110,37 +110,69 @@ app.use(errorHandler)
 app.use(cors());
 app.options('*', cors());
 //API connections
+
+
+//Login
+
+
+//Analytics
+app.get(`${API}/product/analytics`, getProductAnalytics);
+
+
+//Product
 app.post(`${API}/product/newproduct`, newProduct);
 app.get(`${API}/product/list`, getProductList);
 app.get(`${API}/product/listbycatid/:id`, getProductListByCat);
 app.delete(`${API}/product/:id`, deleteProduct);
 app.get(`${API}/productid/:id`, getProductById);
 app.get(`${API}/product/todaysmenu/:id`, getTodaysList);
-app.get(`${API}/product/analytics`, getProductAnalytics);
 app.get(`${API}/product`, filterByCategories);
 app.get(`${API}/product/search/:id`, searchProduct);
 app.get(`${API}/products/gettoppick/:id`, getTopPicksData);
 app.put(`${API}/product/:id`, editProduct);
 app.get(`${API}/product/listbysellerid/:id`, getProductListBySeller)
 app.get(`${API}/product/pendingsa`, getPendingStatusProductList)
+
+
+// Main Category
+app.post(`${API}/maincategory/new`, addNewMainCategory)
+app.get(`${API}/maincategory/list`, getMainCategoryList)
+app.put(`${API}/maincategory/:id`, editMainCategory)
+app.delete(`${API}/maincategory/:id`,deleteMainCategory);
+
+// Category
 app.get(`${API}/category/list`, getCategoryList);
 app.get(`${API}/categoryname/list`, getCategoryNameList);
 app.get(`${API}/categoryname/dashlist`, getDashboarCategory);
-app.put(`${API}/images/aws`, deleteImageFromAWS);
 app.post(`${API}/category/newcategory`, addNewCategory);
 app.delete(`${API}/category/:id`, deleteCategory);
-app.delete(`${API}/order/:id`, deleteOrder);
 app.put(`${API}/category/:id`, editCategory);
-app.delete(`${API}/orderitem/deleteall`, deleteOrderItems);
-app.get(`${API}/orderitem/list`, getOrderItemList);
-app.get(`${API}/order/analytics`, getOrderSales);
-app.get(`${API}/order/list`, getOrderList);
-app.put(`${API}/order/edit/:id`, editOrderStatus);
+app.get(`${API}/category/listbypid/:id`, getCategoryListByPID)
+
+
+
+
+
+
+app.put(`${API}/images/aws`, deleteImageFromAWS);
+
 app.post(`${API}/order/new`, newOrder);
 app.get(`${API}/order/:id`, getOrderById);
+app.get(`${API}/order/list`, getOrderList);
+app.delete(`${API}/order/:id`, deleteOrder);
+app.get(`${API}/order/analytics`, getOrderSales);
+
+app.delete(`${API}/orderitem/deleteall`, deleteOrderItems);
+app.get(`${API}/orderitem/list`, getOrderItemList);
+
+
+app.put(`${API}/order/edit/:id`, editOrderStatus);
+
 app.get(`${API}/order/admin/pending/:id`, orderPending);
 app.get(`${API}/order/admin/delivered/:id`, orderDelivered);
 app.get(`${API}/order/user/:id`, getOrderByUserId);
+
+
 app.get(`${API}/user/list`, getUserList);
 app.post(`${API}/user/add`, newUser);
 app.post(`${API}/user/login`, login);
@@ -195,10 +227,7 @@ app.get(`${API}/shop/:id`, getShopById)
 app.put(`${API}/shop/:id`, updateShop)
 app.get(`${API}/chatlist/:fid/:tid`, ChatList)
 app.post(`${API}/chatlist/new`, addNewChat)
-app.post(`${API}/maincategory/new`, addNewMainCategory)
-app.get(`${API}/maincategory/list`, getMainCategoryList)
-app.put(`${API}/maincategory/:id`, editMainCategory)
-app.get(`${API}/category/listbypid/:id`, getCategoryListByPID)
+
 app.get(`${API}/seller/earnings/:id`, getSellerEarningAnalytics);
 app.get(`${API}/cart/increase/:id`, increaseCartItem);
 app.get(`${API}/cart/decrease/:id`, decreaseCartItem);

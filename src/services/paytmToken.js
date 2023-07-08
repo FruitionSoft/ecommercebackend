@@ -9,7 +9,7 @@ const getPaytmToken = (body, callback) => {
     var paytmParams = {};
 
     const MID = process.env.MID_DEV
-    const MKEY = process.env.MKEY_DEV
+    const MKEY = process.env.MKEY
 
     paytmParams.body = body;
 
@@ -17,8 +17,9 @@ const getPaytmToken = (body, callback) => {
     * Generate checksum by parameters we have in body
     * Find your Merchant Key in your Paytm Dashboard at https://dashboard.paytm.com/next/apikeys 
     */
+    console.log('paytmParams.body: ',paytmParams.body)
     PaytmChecksum.generateSignature(JSON.stringify(paytmParams.body), MKEY).then(function (checksum) {
-
+        console.log('checksum: ',checksum)
         paytmParams.head = {
             "signature": checksum
         };

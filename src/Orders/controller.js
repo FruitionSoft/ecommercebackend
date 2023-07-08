@@ -195,9 +195,10 @@ const newOrder = async (req, res) => {
             // ]
         }
         console.log(TokenBody);
-        getPaytmToken(TokenBody, resp => {
-            return res.status(201).send({ success: true, message: '', data: output, token: resp.body.txnToken });
-        })
+        return res.status(201).send({ success: true, message: '', data: output });
+        // getPaytmToken(TokenBody, resp => {
+        //     return res.status(201).send({ success: true, message: '', data: output, token: resp.body.txnToken });
+        // })
     } catch (error) {
         return res.status(500).send({ success: false, message: "Bad request", error: error.message })
     }

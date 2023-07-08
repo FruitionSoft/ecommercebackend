@@ -30,8 +30,21 @@ const editMainCategory = async (req, res) => {
     })
 }
 
+const deleteMainCategory = async (req, res) => {
+    await MainCategory.findByIdAndDelete(req.params.id).then(response => {
+        if (response) {
+            return res.status(201).send({ success: true, message: 'Data deleted.' });
+        } else {
+            return res.status(404).send({ success: false, message: 'Category not found' });
+        }
+    }).catch(err => {
+        return res.status(500).send({ error: err, success: false })
+    })
+}
+
 module.exports = {
     addNewMainCategory,
     getMainCategoryList,
-    editMainCategory
+    editMainCategory,
+    deleteMainCategory
 }

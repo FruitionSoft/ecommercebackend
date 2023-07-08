@@ -4,6 +4,10 @@ const mainCategorySchema = mongoose.Schema({
     name: {
         type: String,
         required: true
+    },
+    categoryTypeId: {
+        type: Number,
+        default: 1
     }
 })
 

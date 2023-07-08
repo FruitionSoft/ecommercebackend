@@ -2,6 +2,7 @@ const Products = require('./model');
 const mongoose = require('mongoose');
 
 const newProduct = (req, res) => {
+    console.log(req.body)
     const productData = new Products(req.body);
     productData.save().then(data => {
         return res.status(201).send({ success: true, message: 'Data saved' });
@@ -61,14 +62,14 @@ const getProductListByCat = async (req, res) => {
     if (!ProductList) {
         res.status(500).send({ success: false })
     } else {
-        res.status(201).send({ success: true, message: '', data: ProductList });
+        res.status(201).send({ success: true, message: '', data: ProductList ,count: ProductList.length});
     }
 }
 
 const getProductListBySeller = async (req, res) => {
     await Products.find({ productOwner: req.params.id }).populate('category', 'name parentCategory')
         .then(response => {
-            return res.status(201).send({ success: true, message: '', data: response });
+            return res.status(201).send({ success: true, message: '', data: response,count:response.length });
         }).catch(error => {
             return res.status(500).send({ success: false, error: error.message })
         })
@@ -88,7 +89,7 @@ const getTodaysList = async (req, res) => {
     if (!ProductList) {
         res.status(500).send({ success: false })
     } else {
-        res.status(201).send({ success: true, message: '', data: ProductList });
+        res.status(201).send({ success: true, message: '', data: ProductList});
     }
 }
 
@@ -103,6 +104,7 @@ const getProductAnalytics = async (req, res) => {
 
 const filterByCategories = async (req, res) => {
     let filterData = {};
+    console.log(req)
     if (req.query.categories) {
         filterData = { category: req.query.categories.split(',') }
     }
