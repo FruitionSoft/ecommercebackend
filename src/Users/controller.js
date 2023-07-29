@@ -10,12 +10,13 @@ const getUserList = async (req, res) => {
         if (!userList) {
             res.status(500).send({ success: false })
         } else {
-            res.status(201).send({ success: true, message: '', data: userList });
+            res.status(200).send({ success: true, message: '', data: userList });
         }
     } catch (error) {
         res.status(500).send({ success: false, message: 'Bad request' })
     }
 }
+
 
 const getAdminTokens = async (req, res) => {
     try {
@@ -23,7 +24,7 @@ const getAdminTokens = async (req, res) => {
         if (!userList) {
             res.status(500).send({ success: false })
         } else {
-            res.status(201).send({ success: true, message: '', data: userList });
+            res.status(200).send({ success: true, message: '', data: userList });
         }
     } catch (error) {
         res.status(500).send({ success: false, message: 'Bad request' })
@@ -34,7 +35,7 @@ const getSellerToken = async (req, res) => {
     try {
         await User.find({ _id: req.params.id }).select('token')
             .then(response => {
-                res.status(201).send({ success: true, message: '', data: response });
+                res.status(200).send({ success: true, message: '', data: response });
             }).catch(error => {
                 res.status(500).send({ success: false, message: error.message });
             })
@@ -49,7 +50,7 @@ const editUser = async (req, res) => {
             return res.status(500).send({ error: 'Invalid user id', success: false })
         }
         await User.findByIdAndUpdate(req.params.id, req.body).then(response => {
-            return res.status(201).send({ success: true, message: 'Data updated.' });
+            return res.status(200).send({ success: true, message: 'Data updated.' });
         }).catch(err => {
             return res.status(500).send({ error: err, success: false })
         })
@@ -80,7 +81,6 @@ const forgotPassword = async (req, res) => {
 
 const newUser = async (req, res) => {
     try {
-        console.log(req.body)
         const user = await User.findOne({ phone: req.body.phone });
         if (!user) {
             let otpnumber = Math.random() * (9999 - 1000) + 1000
@@ -113,12 +113,12 @@ const   otpValidator = async (req, res) => {
             if (req.body) {
                 let body = { status: req.body.status }
                 await User.findByIdAndUpdate(req.params.id, body).then(response => {
-                    return res.status(201).send({ success: true, message: 'Data found.' });
+                    return res.status(200).send({ success: true, message: 'Data found.' });
                 }).catch(err => {
                     return res.status(500).send({ error: err, success: false })
                 })
             } else {
-                return res.status(201).send({ success: true, message: 'Data found.' });
+                return res.status(200).send({ success: true, message: 'Data found.' });
             }
         } else {
             res.status(500).send({ success: false, message: 'Wrong OTP' })
@@ -144,7 +144,7 @@ const login = async (req, res) => {
                 process.env.SECRET,
             )
             // {expiresIn: '1d'} //1d = one day, 1w = one week, 1m = one month
-            return res.status(201).send({ success: true, message: 'Login success', userId: user._id, token: userToken });
+            return res.status(200).send({ success: true, message: 'Login success', userId: user._id, token: userToken });
         } else {
             return res.status(500).send({ success: false, message: 'Wrong password.' });
         }
@@ -168,7 +168,7 @@ const loginAdmin = async (req, res) => {
                 process.env.SECRET,
             )
             // {expiresIn: '1d'} //1d = one day, 1w = one week, 1m = one month
-            return res.status(201).send({ success: true, message: 'Login success', userId: user._id, token: userToken });
+            return res.status(200).send({ success: true, message: 'Login success', userId: user._id, token: userToken });
         } else {
             return res.status(500).send({ success: false, message: 'Wrong password.', data: bcrpt });
         }
@@ -177,13 +177,14 @@ const loginAdmin = async (req, res) => {
     }
 }
 
+
 const getUserById = async (req, res) => {
     try {
         const userData = await User.findById(req.params.id);
         if (!userData) {
             res.status(400).send({ success: false, message: "User not found" })
         } else {
-            res.status(201).send({ success: true, message: '', data: userData });
+            res.status(200).send({ success: true, message: '', data: userData });
         }
     } catch (error) {
         res.status(500).send({ success: false, message: 'Bad request' })
@@ -200,7 +201,7 @@ const generateOTP = async (req, res) => {
             console.log(userData)
             await User.findByIdAndUpdate(userData._id, { otp: Math.round(otpnumber) }).then(response => {
                 sendSMS(Math.round(otpnumber), `${userData.country_code}${req.params.id}`)
-                return res.status(201).send({ success: true, message: userData });
+                return res.status(200).send({ success: true, message: userData });
             }).catch(err => {
                 return res.status(500).send({ error: err, success: false })
             })
@@ -213,7 +214,7 @@ const generateOTP = async (req, res) => {
 const getUserAnalytics = async (req, res) => {
     console.log('hi')
     await User.find().then(UserCount => {
-        res.status(201).send({success: true, message: '', total_users: UserCount.length});
+        res.status(200).send({success: true, message: '', total_users: UserCount.length});
     }).catch(err => {
         res.status(500).send({success: false, error: err})
     })
@@ -223,7 +224,7 @@ const deleteUser = async (req, res) => {
     try {
         await User.findByIdAndDelete(req.params.id).then(response => {
             if (response) {
-                return res.status(201).send({ success: true, message: 'Data deleted.' });
+                return res.status(200).send({ success: true, message: 'Data deleted.' });
             } else {
                 return res.status(404).send({ success: false, message: 'User not found' });
             }
@@ -235,6 +236,21 @@ const deleteUser = async (req, res) => {
     }
 }
 
+const refreshToken =async(req,res)=>{
+    const user = await User.find({_id: req.params.id, isAdmin: true})
+    if (!user) {
+        return res.status(500).send({ success: false, message: 'User not found.' });
+    }else{
+        let userToken = jwt.sign(
+            {
+                userId: user._id,
+                isAdmin: user.isAdmin
+            },
+            process.env.SECRET,
+        )
+        return res.status(201).send({ success: true, userId: req.params.id, token: userToken });
+    }
+}
 module.exports = {
     getUserList,
     newUser,
@@ -248,5 +264,6 @@ module.exports = {
     generateOTP,
     loginAdmin,
     getAdminTokens,
-    getSellerToken
+    getSellerToken,
+    refreshToken
 };

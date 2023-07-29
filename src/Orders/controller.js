@@ -12,13 +12,15 @@ const getOrderList = async (req, res) => {
                 populate: { path: 'product' }
             })
             .populate('user', 'name').sort({ 'dateOrdered': -1 });
+            console.log('Initialize response: ', controllerList)
         if (!controllerList) {
-            res.status(500).send({ success: false })
+            console.log(controllerList)
+            return res.status(500).send({ success: false })
         } else {
-            res.status(201).send({ success: true, message: '', data: controllerList });
+            return res.status(200).send({ success: true, message: '', data: controllerList });
         }
     } catch (error) {
-        res.status(500).send({ success: false, message: "Bad request" })
+        return res.status(500).send({ success: false, message: "Bad request" })
     }
 }
 
@@ -31,20 +33,23 @@ const getOrderSales = async (req, res) => {
         if (!orderAnalytics) {
             res.status(500).send({ success: false })
         } else {
-            res.status(201).send({ success: true, message: '', totalPrice: orderAnalytics.pop().totalsales, totalOrder: orderCount });
+            res.status(200).send({ success: true, message: '', totalPrice: orderAnalytics.pop().totalsales, totalOrder: orderCount });
         }
     } catch (error) {
         res.status(500).send({ success: false, error: error.message })
     }
 }
 
+
+
 const getOrderById = async (req, res) => {
     try {
+        console.log('here')
         await Order.find({ _id: req.params.id })
             .populate('user', 'name token')
             .populate({ path: 'orderItems', populate: { path: 'product' } }).populate({ path: "addressId" })
             .then(response => {
-                return res.status(201).send({ success: true, message: '', data: response[0] });
+                return res.status(200).send({ success: true, message: '', data: response[0] });
             }).catch(error => {
                 res.status(500).send({ success: false, error: error.message })
             })
@@ -62,7 +67,7 @@ const orderPending = async (req, res) => {
         if (!orderDetails) {
             res.status(500).send({ success: false })
         } else {
-            res.status(201).send({ success: true, message: '', data: orderDetails });
+            res.status(200).send({ success: true, message: '', data: orderDetails });
         }
     } catch (error) {
         res.status(500).send({ success: false, message: "Bad request" })
@@ -78,7 +83,7 @@ const orderDelivered = async (req, res) => {
         if (!orderDetails) {
             res.status(500).send({ success: false })
         } else {
-            res.status(201).send({ success: true, message: '', data: orderDetails });
+            res.status(200).send({ success: true, message: '', data: orderDetails });
         }
     } catch (error) {
         res.status(500).send({ success: false, message: "Bad request" })
@@ -93,7 +98,7 @@ const getOrderByUserId = async (req, res) => {
             })
             .populate('user', 'name')
             .then(response => {
-                return res.status(201).send({ success: true, message: '', data: response });
+                return res.status(200).send({ success: true, message: '', data: response });
             }).catch(error => {
                 res.status(500).send({ success: false, error: error.message })
             })
@@ -108,7 +113,7 @@ const editOrderStatus = async (req, res) => {
             return res.status(500).send({ error: 'Invalid order id', success: false })
         }
         await Order.findByIdAndUpdate(req.params.id, req.body).then(response => {
-            return res.status(201).send({ success: true, message: 'Data updated.' });
+            return res.status(200).send({ success: true, message: 'Data updated.' });
         }).catch(err => {
             return res.status(500).send({ error: err, success: false })
         })
@@ -128,7 +133,7 @@ const deleteOrder = async (req, res) => {
             })
             await Order.findByIdAndDelete(req.params.id).then(response => {
                 if (response) {
-                    return res.status(201).send({ success: true, message: 'Data deleted.' });
+                    return res.status(200).send({ success: true, message: 'Data deleted.' });
                 } else {
                     return res.status(404).send({ success: false, message: 'Order not found' });
                 }
@@ -145,7 +150,6 @@ const newOrder = async (req, res) => {
     try {
         let output = [];
         await Promise.all(req.body.orderItems.map(async item => {
-            console.log(req.body)
             const newOrderItem = new OrderItem({
                 product: item.productId,
                 quantity: item.quantity

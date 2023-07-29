@@ -14,18 +14,19 @@ const { newProduct, getProductList, getProductListByCat, editProduct, deleteProd
 const { getCategoryList, addNewCategory, deleteCategory, editCategory, getCategoryNameList, getDashboarCategory, deleteImageFromAWS, getCategoryListByPID } = require('./src/Category/controller');
 const { getOrderItemList, deleteOrderItems } = require('./src/OrderItems/controller');
 const { getOrderList, newOrder, getOrderById, getOrderByUserId, editOrderStatus, deleteOrder, getOrderSales, orderPending, orderDelivered } = require('./src/Orders/controller');
-const { getUserList, newUser, getUserById, login, editUser, getUserAnalytics, deleteUser, otpValidator, forgotPassword, generateOTP, loginAdmin, getAdminTokens, getSellerToken } = require('./src/Users/controller');
-const { addCart, CartList, deleteCartProduct, CartProductList, deleteCartByUser, increaseCartItem, decreaseCartItem } = require('./src/Cart/controller');
+const { getUserList, newUser, getUserById, login, editUser, getUserAnalytics, deleteUser, otpValidator, forgotPassword, generateOTP, loginAdmin, getAdminTokens, getSellerToken,refreshToken } = require('./src/Users/controller');
+const { addCart,editCart, CartList, deleteCartProduct, CartProductList, deleteCartByUser, increaseCartItem, decreaseCartItem } = require('./src/Cart/controller');
 const { getReviewByProductId, addNewReview } = require('./src/Review/controller');
 const { addFav, FavList, deleteFavProduct, FavDetailedList } = require('./src/Favoruit/controller');
 const { addaddr, addrList, deleteaddr, editAddress, addrById, getCityState } = require('./src/Address/controller');
 const { addDelv, DelvList, editDelv, DelvListAll, deleteAllList } = require('./src/DeliveryFee/controller');
 const { adminAnalytics, getSellerList, getSellerEarningAnalytics } = require("./src/Analytics/controller");
 const { mascelinous } = require("./src/Constants/mascelinous");
-const { newSize, getSizeList, getSizeById, editSize, deleteSize } = require("./src/Size/controller");
+const { newSize, getSizeList, getSizeById, editSize, deleteSize,getSizeByCategoryID } = require("./src/Size/controller");
 const { newBusinessData, getShopList, deleteShop, getShopById, updateShop } = require("./src/BusinessData/controller");
 const { addNewChat, ChatList, updateChat } = require("./src/chat/controller");
 const { addNewMainCategory, getMainCategoryList, editMainCategory,deleteMainCategory } = require("./src/MainCategory/controller");
+const {getDimensions,NewDimensions,getDimensionsById,EditDimensions,deleteDimensions} = require("./src/Dimensions/controller");
 app.use(bodyParser.json({ limit: '50mb', type: 'application/json' }));
 const { uploadProduct } = require('./services/multer');
 //Bank API
@@ -119,6 +120,13 @@ app.options('*', cors());
 app.get(`${API}/product/analytics`, getProductAnalytics);
 
 
+//Dimensions
+app.get(`${API}/dimensions/list`, getDimensions);
+app.post(`${API}/dimensions/new`, NewDimensions);
+app.get(`${API}/dimensions/list/:id`, getDimensionsById);
+app.put(`${API}/dimensions/update/:id`, EditDimensions);
+app.delete(`${API}/dimensions/delete/:id`,deleteDimensions);
+
 //Product
 app.post(`${API}/product/newproduct`, newProduct);
 app.get(`${API}/product/list`, getProductList);
@@ -131,7 +139,7 @@ app.get(`${API}/product/search/:id`, searchProduct);
 app.get(`${API}/products/gettoppick/:id`, getTopPicksData);
 app.put(`${API}/product/:id`, editProduct);
 app.get(`${API}/product/listbysellerid/:id`, getProductListBySeller)
-app.get(`${API}/product/pendingsa`, getPendingStatusProductList)
+app.get(`${API}/product/pending`, getPendingStatusProductList)
 
 
 // Main Category
@@ -150,54 +158,62 @@ app.put(`${API}/category/:id`, editCategory);
 app.get(`${API}/category/listbypid/:id`, getCategoryListByPID)
 
 
-
-
-
-
 app.put(`${API}/images/aws`, deleteImageFromAWS);
 
+//Order
 app.post(`${API}/order/new`, newOrder);
 app.get(`${API}/order/:id`, getOrderById);
-app.get(`${API}/order/list`, getOrderList);
+app.get(`${API}/order/list/all`, getOrderList);
 app.delete(`${API}/order/:id`, deleteOrder);
-app.get(`${API}/order/analytics`, getOrderSales);
-
+app.get(`${API}/order/new/analytics`, getOrderSales);
 app.delete(`${API}/orderitem/deleteall`, deleteOrderItems);
 app.get(`${API}/orderitem/list`, getOrderItemList);
-
-
 app.put(`${API}/order/edit/:id`, editOrderStatus);
-
 app.get(`${API}/order/admin/pending/:id`, orderPending);
 app.get(`${API}/order/admin/delivered/:id`, orderDelivered);
 app.get(`${API}/order/user/:id`, getOrderByUserId);
 
 
 app.get(`${API}/user/list`, getUserList);
+app.get(`${API}/user/:id`, getUserById);
 app.post(`${API}/user/add`, newUser);
 app.post(`${API}/user/login`, login);
 app.post(`${API}/user/loginadmin`, loginAdmin);
 app.put(`${API}/user/update/:id`, editUser);
+
+//cart
 app.post(`${API}/cart/new`, addCart);
+app.put(`${API}/cart/update/:id`,editCart);
 app.delete(`${API}/cart/:id`, deleteCartProduct);
 app.get(`${API}/cartproduct/:id`, CartProductList);
 app.get(`${API}/cart/:id`, CartList);
-app.post(`${API}/fav/new`, addFav);
 app.delete(`${API}/cart/user/:id`, deleteCartByUser);
+app.get(`${API}/cart/increase/:id`, increaseCartItem);
+app.get(`${API}/cart/decrease/:id`, decreaseCartItem);
+
+//fav
+app.post(`${API}/fav/new`, addFav);
 app.delete(`${API}/fav/:id`, deleteFavProduct);
 app.get(`${API}/fav/productlist/:id`, FavDetailedList);
 app.get(`${API}/fav/:id`, FavList);
+
+//Address
 app.post(`${API}/address/new`, addaddr);
 app.delete(`${API}/address/:id`, deleteaddr);
 app.get(`${API}/getcitystate/:id`, getCityState);
 app.get(`${API}/address/:id`, addrList);
 app.get(`${API}/addressbyid/:id`, addrById);
 app.put(`${API}/address/:id`, editAddress);
+
+//Delivery
 app.post(`${API}/delivery/new`, addDelv);
 app.put(`${API}/delivery/:id`, editDelv);
 app.get(`${API}/delivery/:id`, DelvList);
 app.get(`${API}/delivery/list/all`, DelvListAll);
 app.delete(`${API}/delivery/list/delete`, deleteAllList);
+
+//user
+app.get(`${API}/refershToken/:id`,refreshToken);
 app.get(`${API}/user/count`, getUserAnalytics);
 app.get(`${API}/user/generateotp/:id`, generateOTP);
 app.delete(`${API}/user/:id`, deleteUser);
@@ -205,37 +221,50 @@ app.put(`${API}/user/otp/:id`, otpValidator);
 app.get(`${API}/user/admin/token`, getAdminTokens);
 app.put(`${API}/user/password/:id`, forgotPassword);
 app.get(`${API}/user/seller/token/:id`, getSellerToken);
+app.get(`${API}/user/mascelinous`, mascelinous);
+
+//review
 app.get(`${API}/review/:id`, getReviewByProductId);
 app.post(`${API}/review/new`, addNewReview);
+
+//admin
 app.get(`${API}/admin/analytics/:id`, adminAnalytics);
 app.get(`${API}/admin/seller/list`, getSellerList);
-app.get(`${API}/user/mascelinous`, mascelinous);
-app.get(`${API}/user/:id`, getUserById);
+app.get(`${API}/deleteAllProduct`, deleteAllProduct)
+app.get(`${API}/seller/earnings/:id`, getSellerEarningAnalytics);
+
+
 app.get(`${API}/image/:name`, (req, res) => {
     fs.writeFileSync(__dirname + './assets/products/1662310783847_1631095891215.jpeg')
 });
-app.get(`${API}/deleteAllProduct`, deleteAllProduct)
+
+//Size
 app.post(`${API}/size/add`, newSize)
 app.get(`${API}/size/list`, getSizeList)
 app.get(`${API}/size/:id`, getSizeById)
+app.get(`${API}/size/category/:id`, getSizeByCategoryID)
 app.put(`${API}/size/:id`, editSize)
 app.delete(`${API}/size/:id`, deleteSize)
+
+//Shop
 app.post(`${API}/shop/add`, newBusinessData)
 app.get(`${API}/shop/list/:id`, getShopList)
 app.delete(`${API}/shop/:id`, deleteShop)
 app.get(`${API}/shop/:id`, getShopById)
 app.put(`${API}/shop/:id`, updateShop)
+
+//Chat
 app.get(`${API}/chatlist/:fid/:tid`, ChatList)
 app.post(`${API}/chatlist/new`, addNewChat)
 
-app.get(`${API}/seller/earnings/:id`, getSellerEarningAnalytics);
-app.get(`${API}/cart/increase/:id`, increaseCartItem);
-app.get(`${API}/cart/decrease/:id`, decreaseCartItem);
+
 //Bank API Calls , 
 app.get(`${API}/seller/baccount/:id`, getBankDataById)
 app.post(`${API}/seller/baccount`, addNewBankDetail)
 app.put(`${API}/seller/baccount/:id`, updateBankDetail)
 app.get(`${API}/seller/baccountpending`, getPendingBankData)
+
+
 // Fund API 
 app.get(`${API}/seller/fund/:id`, getFundData)
 app.post(`${API}/seller/fund`, addNewFundDetail)

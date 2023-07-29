@@ -92,10 +92,10 @@ const adminAnalytics = async (req, res) => {
         list.incomeData = await getIncomeData(incomeList);
         list.analytics = totalAnalytics
         console.log(list.incomeData)
-        return res.status(201).send({ success: true, message: '', data: list });
+        return res.status(200).send({ success: true, message: '', data: list });
     } catch (error) {
         console.log(error.message)
-        return res.status(500).send({ success: false, message: "Bad request" })
+        return res.status(400).send({ success: false, message: "Bad request" })
     }
 }
 
@@ -124,7 +124,7 @@ function getIncomeData(orders) {
 const getSellerList = async (req, res) => {
     await User.find({ isAdmin: true, isSA: false }).select('-passwordHash -otp')
         .then(response => {
-            return res.status(201).send({ success: true, message: '', data: response });
+            return res.status(200).send({ success: true, message: '', data: response });
         }).catch(error => {
             return res.status(500).send({ success: false, error: error.message });
         })
@@ -167,12 +167,12 @@ const getSellerEarningAnalytics = async (req, res) => {
 
                     result.amount_claimed = fund_raised;
                 }
-                return res.status(201).send({ success: true, message: '', data: result })
+                return res.status(200).send({ success: true, message: '', data: result })
             }).catch(error => {
                 return res.status(500).send({ success: false, message: '', error: error.message })
             })
     } catch (error) {
-        return res.status(500).send({ success: false, message: 'Bad request' })
+        return res.status(400).send({ success: false, message: 'Bad request' })
     }
 }
 

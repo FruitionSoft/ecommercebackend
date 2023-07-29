@@ -6,7 +6,7 @@ const { response } = require('express');
 const getCategoryList = async (req, res) => {
     await Category.find()
     .then(response => {
-        return res.status(201).send({ success: true, message: '', data: response });
+        return res.status(200).send({ success: true, message: '', data: response });
     }).catch(error => {
         return res.status(500).send({ success: false, error: error.message })
     })
@@ -15,7 +15,7 @@ const getCategoryList = async (req, res) => {
 const getCategoryListByPID = async (req, res) => {
     await Category.find({parentCategory: req.params.id})
     .then(response => {
-        return res.status(201).send({ success: true, message: '', data: response });
+        return res.status(200).send({ success: true, message: '', data: response });
     }).catch(error => {
         return res.status(500).send({ success: false, error: error.message })
     })
@@ -26,7 +26,7 @@ const getDashboarCategory = async (req, res) => {
     if (!CategoryList) {
         return res.status(500).send({ success: false })
     } else {
-        return res.status(201).send({ success: true, message: '', data: CategoryList });
+        return res.status(200).send({ success: true, message: '', data: CategoryList });
     }
 }
 
@@ -35,7 +35,7 @@ const getCategoryNameList = async (req, res) => {
     if (!CategoryList) {
         return res.status(500).send({ success: false })
     } else {
-        return res.status(201).send({ success: true, message: '', data: CategoryList });
+        return res.status(200).send({ success: true, message: '', data: CategoryList });
     }
 }
 
@@ -53,7 +53,7 @@ const editCategory = async (req, res) => {
         return res.status(500).send({ error: 'Invalid category id', success: false })
     }
     await Category.findByIdAndUpdate(req.params.id, req.body).then(response => {
-        return res.status(201).send({ success: true, message: 'Data updated.' });
+        return res.status(200).send({ success: true, message: 'Data updated.' });
     }).catch(err => {
         return res.status(500).send({ error: err, success: false })
     })
@@ -62,7 +62,7 @@ const editCategory = async (req, res) => {
 const deleteCategory = async (req, res) => {
     await Category.findByIdAndDelete(req.params.id).then(response => {
         if (response) {
-            return res.status(201).send({ success: true, message: 'Data deleted.' });
+            return res.status(200).send({ success: true, message: 'Data deleted.' });
         } else {
             return res.status(404).send({ success: false, message: 'Category not found' });
         }
@@ -84,7 +84,7 @@ const deleteImageFromAWS = async (req, res) => {
             console.log(data)
             if (err) return res.status(500).send({ error: err, success: false, message:"something went wrong" })
             // an error occurred
-            else return res.status(201).send({ data: data, success: true })
+            else return res.status(200).send({ data: data, success: true })
         });
     } catch (err) {
         return res.status(500).send({ error: err, success: false })

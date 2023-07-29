@@ -2,9 +2,9 @@ const {Review} = require('./model');
 
 const getReviewByProductId = async (req, res) => {
     return await Review.find({productId: req.params.id}).populate('userId', 'name').then(response => {
-        return res.status(201).send({ success: true, message: '', data: response });
+        return res.status(200).send({ success: true, message: '', data: response });
     }).catch(error => {
-        return res.status(500).send({ success: false, message: "No data found" });
+        return res.status(404).send({ success: false, message: "No data found" });
     })
 }
 

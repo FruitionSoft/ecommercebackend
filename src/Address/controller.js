@@ -5,7 +5,7 @@ const CITY_LIST = require("../../utils/indianCityList.json");
 const addaddr = async(req, res) => {
         const addr = new AddressData(req.body);
         await addr.save().then(response => {
-            res.status(200).send({success: true, message: 'Data saved.'})
+            res.status(201).send({success: true, message: 'Data saved.'})
         }).catch(err => {
             res.status(500).send({success: false, message: '', error: err})
         })
@@ -16,25 +16,25 @@ const addrList = async(req, res) => {
     if(!addrList) {
         res.status(500).send({success: false, message: 'No data found!'})
     }else {
-        res.status(201).send({success: true, message: '', data: addrList});
+        res.status(200).send({success: true, message: '', data: addrList});
     }
 }
 
 const addrById = async(req, res) => {
     const addrList = await AddressData.find({_id: req.params.id});
     if(!addrList) {
-        res.status(500).send({success: false, message: 'No data found!'})
+        res.status(404).send({success: false, message: 'No data found!'})
     }else {
-        res.status(201).send({success: true, message: '', data: addrList[0]});
+        res.status(200).send({success: true, message: '', data: addrList[0]});
     }
 }
 
 const editAddress = async (req, res) => {
     if (!mongoose.isValidObjectId(req.params.id)) {
-        return res.status(500).send({ error: 'Invalid address id', success: false })
+        return res.status(400).send({ error: 'Invalid address id', success: false })
     }
     await AddressData.findByIdAndUpdate(req.params.id, req.body ).then(response => {
-        return res.status(201).send({ success: true, message: 'Data updated.' });
+        return res.status(200).send({ success: true, message: 'Data updated.' });
     }).catch(err => {
         return res.status(500).send({ error: err, success: false })
     })

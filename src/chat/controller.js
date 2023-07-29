@@ -16,7 +16,7 @@ const ChatList = async(req, res) => {
         if(response.length > 0) {
             response[0].messages.reverse();
         }
-        return res.status(201).send({success: true, message: '', data: response});
+        return res.status(200).send({success: true, message: '', data: response});
     }).catch(error => {
         return res.status(500).send({success: false, message: error.message});
     })

@@ -3,12 +3,25 @@ const { CartData } = require('./model');
 const addCart = async (req, res) => {
   const Cart = new CartData(req.body);
   await Cart.save().then(response => {
-    console.log(response)
-    return res.status(200).send({ success: true, message: 'Data saved.' })
+    return res.status(201).send({ success: true, message: 'Data saved.' })
   }).catch(error => {
     console.log(error.message)
     return res.status(500).send({ success: false, message: '', error: error.message })
   })
+}
+
+const editCart = async (req,res)=>{
+    try {
+      if (!req.params.id) {
+        res.status(400).send({ success: false, status: 400, error: 'Bad Request', message: 'Need to pass Cart id as Params' })
+      } else {
+        await CartData.findByIdAndUpdate(req.params.id,req.body).then(response=>{
+          return res.send({ success: true, status: 200, message: 'Cart Updated Successfully' })
+        })};
+        
+      }catch (error) {
+      res.status(404).send({ success: false, status: res.status, error: 'Bad Request', message: 'Error While on Cart Update' })
+    }
 }
 
 const CartList = async (req, res) => {
@@ -16,7 +29,7 @@ const CartList = async (req, res) => {
   if (!CartList) {
     res.status(500).send({ success: false, message: 'No data found!' })
   } else {
-    res.status(201).send({ success: true, message: '', data: CartList });
+    res.status(200).send({ success: true, message: '', data: CartList });
   }
 }
 
@@ -25,7 +38,7 @@ const CartProductList = async (req, res) => {
   if (!CartList) {
     res.status(500).send({ success: false, message: 'No data found!' })
   } else {
-    res.status(201).send({ success: true, message: '', data: CartList });
+    res.status(200).send({ success: true, message: '', data: CartList });
   }
 }
 
@@ -60,7 +73,7 @@ const deleteCartByUser = async (req, res) => {
 const decreaseCartItem = async (req, res) => {
   await CartData.updateOne({ _id: req.params.id }, { $inc: { quantity: -1 } })
   .then(response => {
-    res.status(201).send({ success: true, message: '', data: response });
+    res.status(200).send({ success: true, message: '', data: response });
   }).catch(error => {
     res.status(500).send({ success: false, message: '', error: error.message })
   })
@@ -69,7 +82,7 @@ const decreaseCartItem = async (req, res) => {
 const increaseCartItem = async (req, res) => {
   await CartData.updateOne({ _id: req.params.id }, { "$inc": { "quantity": 1 } })
   .then(response => {
-    res.status(201).send({ success: true, message: '', data: response });
+    res.status(200).send({ success: true, message: '', data: response });
   }).catch(error => {
     res.status(500).send({ success: false, message: '', error: error.message })
   })
@@ -77,6 +90,7 @@ const increaseCartItem = async (req, res) => {
 
 module.exports = {
   addCart,
+  editCart,
   CartList,
   deleteCartProduct,
   CartProductList,
