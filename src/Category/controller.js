@@ -31,7 +31,7 @@ const getDashboarCategory = async (req, res) => {
 }
 
 const getCategoryNameList = async (req, res) => {
-    const CategoryList = await Category.find().select("-image");
+    const CategoryList = await Category.find().select("name");
     if (!CategoryList) {
         return res.status(500).send({ success: false })
     } else {
