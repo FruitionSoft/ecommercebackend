@@ -10,7 +10,7 @@ const bodyParser = require('body-parser');
 //Modules import
 const { authJwt } = require('./helpers/jwt');
 const { errorHandler } = require('./helpers/errorHandler');
-const { newProduct, getProductList, getProductListByCat, editProduct, deleteProduct, getProductById, getTodaysList, getProductAnalytics, filterByCategories, getTopPicksData, searchProduct, deleteAllProduct, getProductListBySeller, getPendingStatusProductList } = require('./src/Product/controller');
+const { newProduct, getProductList, getProductListByCat, editProduct, deleteProduct, getProductById, getTodaysList, getProductAnalytics, filterByCategories, getTopPicksData, searchProduct, deleteAllProduct, getProductListBySeller, getPendingStatusProductList ,getRejectedStatusProductList} = require('./src/Product/controller');
 const { getCategoryList, addNewCategory, deleteCategory, editCategory, getCategoryNameList, getDashboarCategory, deleteImageFromAWS, getCategoryListByPID } = require('./src/Category/controller');
 const { getOrderItemList, deleteOrderItems } = require('./src/OrderItems/controller');
 const { getOrderList, newOrder, getOrderById, getOrderByUserId, editOrderStatus, deleteOrder, getOrderSales, orderPending, orderDelivered } = require('./src/Orders/controller');
@@ -140,6 +140,8 @@ app.get(`${API}/products/gettoppick/:id`, getTopPicksData);
 app.put(`${API}/product/:id`, editProduct);
 app.get(`${API}/product/listbysellerid/:id`, getProductListBySeller)
 app.get(`${API}/product/pending`, getPendingStatusProductList)
+app.get(`${API}/product/rejected`, getRejectedStatusProductList)
+
 
 
 // Main Category

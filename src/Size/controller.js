@@ -12,7 +12,7 @@ const newSize = (req, res) => {
 }
 
 const getSizeList = async (req, res) => {
-    const SizeList = await Size.find()
+    const SizeList = await Size.find().populate("size_type_id",'name shortName').populate("category_id",'name shortName')
     if (!SizeList) {
         res.status(500).send({ success: false })
     } else {
@@ -21,7 +21,7 @@ const getSizeList = async (req, res) => {
 }
 
 const getSizeByCategoryID = async (req, res) => {
-    const sizeList = await Size.find({size_category_id:{ $in: [req.params.id] }}  ) 
+    const sizeList = await Size.find({category_id:{ $in: [req.params.id] }}).populate("size_type_id",'name shortName').populate("category_id",'name shortName')
     if (!sizeList) {
         res.status(500).send({ success: false })
     } else {
@@ -30,7 +30,7 @@ const getSizeByCategoryID = async (req, res) => {
 }
 
 const getSizeById = async (req, res) => {
-    const sizeList = await Size.find({_id:req.params.id }).populate("size_category_id");
+    const sizeList = await Size.find({_id:req.params.id }).populate("size_type_id",'name shortName').populate("category_id",'name shortName')
     if (!sizeList) {
         res.status(500).send({ success: false })
     } else {

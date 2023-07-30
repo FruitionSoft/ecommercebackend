@@ -13,7 +13,9 @@ const newProduct = (req, res) => {
 
 
 const getProductList = async (req, res) => {
-    const ProductList = await Products.find().populate('category');
+    const ProductList = await Products.find({ status: "ACTIVE" }).populate('category')
+    .populate("productOwner",'shopName')
+    .populate("category", 'name showDimensions showSizeSelection');
     if (!ProductList) {
         res.status(500).send({ success: false })
     } else {
@@ -26,7 +28,16 @@ const getPendingStatusProductList = async (req, res) => {
     if (!ProductList) {
         res.status(500).send({ success: false })
     } else {
-        res.status(201).send({ success: true, message: '', data: ProductList });
+        res.status(200).send({ success: true, message: '', data: ProductList });
+    }
+}
+
+const getRejectedStatusProductList = async (req, res) => {
+    const ProductList = await Products.find({ status: "REJECTED" }).populate('category');
+    if (!ProductList) {
+        res.status(500).send({ success: false })
+    } else {
+        res.status(200).send({ success: true, message: '', data: ProductList });
     }
 }
 
@@ -36,7 +47,8 @@ const getTopPicksData = async (req, res) => {
     let skip = (pageNumber - 1) * pageSize;
     await Products.aggregate([
         { "$sample": { "size": pageSize } },
-        { "$skip": skip }])
+        { "$skip": skip }],
+        {status: "ACTIVE"})
         .then(response => {
             return res.status(201).send({ success: true, message: '', data: response });
         }).catch(error => {
@@ -46,7 +58,7 @@ const getTopPicksData = async (req, res) => {
 
 const searchProduct = async (req, res) => {
     try {
-        const SearchResult = await Products.find({ "$or": [{ name: new RegExp(req.params.id, 'i') }] });
+        const SearchResult = await Products.find({ "$or": [{ name: new RegExp(req.params.id, 'i') }] },{status: "ACTIVE"});
         if (!SearchResult) {
             res.status(500).send({ success: false, message: "No data found." })
         } else {
@@ -58,7 +70,8 @@ const searchProduct = async (req, res) => {
 }
 
 const getProductListByCat = async (req, res) => {
-    const ProductList = await Products.find({ category: req.params.id }).populate('category', 'name').populate('productOwner', 'name');
+    const ProductList = await Products.find({ category: req.params.id },{ status: "ACTIVE" }).populate("productOwner",'shopName')
+    .populate("category", 'name showDimensions showSizeSelection');
     if (!ProductList) {
         res.status(500).send({ success: false })
     } else {
@@ -67,7 +80,8 @@ const getProductListByCat = async (req, res) => {
 }
 
 const getProductListBySeller = async (req, res) => {
-    await Products.find({ productOwner: req.params.id }).populate('category', 'name parentCategory')
+    await Products.find({ productOwner: req.params.id },{ status: "ACTIVE" }).populate("productOwner",'shopName')
+    .populate("category", 'name showDimensions showSizeSelection parentCategory')
         .then(response => {
             return res.status(201).send({ success: true, message: '', data: response,count:response.length });
         }).catch(error => {
@@ -76,16 +90,19 @@ const getProductListBySeller = async (req, res) => {
 }
 
 const getProductById = async (req, res) => {
-    await Products.find({ _id: req.params.id }).populate("productOwner", 'shopName')
+    await Products.find({ _id: req.params.id },{ status: "ACTIVE" })
+    .populate("productOwner",'shopName')
+    .populate("category", 'name showDimensions showSizeSelection')
         .then(response => {
-            return res.status(201).send({ success: true, message: '', data: response });
+            const newRes = Object.fromEntries(response)
+            return res.status(201).send({ success: true, message: '', data: response[0] });
         }).catch(error => {
             return res.status(500).send({ success: false, error: error.message })
         })
 }
 
 const getTodaysList = async (req, res) => {
-    const ProductList = await Products.find({ category: req.params.id }).limit(10);
+    const ProductList = await Products.find({ category: req.params.id },{ status: "ACTIVE" }).limit(10);
     if (!ProductList) {
         res.status(500).send({ success: false })
     } else {
@@ -94,7 +111,7 @@ const getTodaysList = async (req, res) => {
 }
 
 const getProductAnalytics = async (req, res) => {
-    const ProductCount = await Products.countDocuments();
+    const ProductCount = await Products.countDocuments({ status: "ACTIVE" });
     if (!ProductCount) {
         res.status(500).send({ success: false })
     } else {
@@ -104,11 +121,10 @@ const getProductAnalytics = async (req, res) => {
 
 const filterByCategories = async (req, res) => {
     let filterData = {};
-    console.log(req)
     if (req.query.categories) {
         filterData = { category: req.query.categories.split(',') }
     }
-    const ProductCount = await Products.find(filterData);
+    const ProductCount = await Products.find(filterData,{ status: "ACTIVE" });
     if (!ProductCount) {
         res.status(500).send({ success: false })
     } else {
@@ -173,5 +189,6 @@ module.exports = {
     searchProduct,
     deleteAllProduct,
     getProductListBySeller,
-    getPendingStatusProductList
+    getPendingStatusProductList,
+    getRejectedStatusProductList
 };

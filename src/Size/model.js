@@ -38,25 +38,30 @@ const sizeSchema = mongoose.Schema({
 
     width: { // PRODUCT WIDTH DATA HERE
         type: Number,
-        required: true
+        required: false
     },
     height: { // PRODUCT HEIGHT DATA HERE
         type: Number,
-        required: true
+        required: false
     },
     length: { // PRODUCT LENGTH DATA HERE
         type: Number,
-        required: true
+        required: false
     },
     breadth: { // PRODUCT BREADTH DATA HERE
         type: Number,
-        required: true
+        required: false
     },
     size_title: { // PRODUCT SIZE TITLE HERE EG. XL, XXL, M, X FOR SHIRTS AND T-SHIRTS
         type: String,
         required: true
     },
-    size_category_id: { // THIS IS THE SUB CATEGORY TYPE ID EG. T-SHIRT
+    size_type_id:{ //KG ,FEET,INCH
+        type: mongoose.Schema.Types.ObjectId,
+        required: false,
+        ref:'Dimensions'
+    },
+    category_id: { // THIS IS THE SUB CATEGORY TYPE ID EG. T-SHIRT
         type: [mongoose.Schema.Types.ObjectId],
         required: true,
         ref:'Category'

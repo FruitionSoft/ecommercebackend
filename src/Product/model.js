@@ -93,6 +93,10 @@ const productSchema = mongoose.Schema({
     status: {
         type: String,
         default: "PENDING"
+    },
+    rejectedReason : {
+        type: String,
+        required: false
     }
 })
 

@@ -2,7 +2,7 @@ const Dimensions = require('./model')
 const mongoose = require('mongoose');
 
 const getDimensions= async(req,res)=>{
-    const DimensionsList = await Dimensions.find()
+    const DimensionsList = await Dimensions.find().populate('categoryid','name')
     if (!DimensionsList) {
         res.status(500).send({ success: false })
     } else {
