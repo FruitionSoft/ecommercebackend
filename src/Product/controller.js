@@ -70,7 +70,7 @@ const searchProduct = async (req, res) => {
 }
 
 const getProductListByCat = async (req, res) => {
-    const ProductList = await Products.find({ category: req.params.id },{ status: "ACTIVE" }).populate("productOwner",'shopName')
+    const ProductList = await Products.find({ category: req.params.id }).populate("productOwner",'shopName')
     .populate("category", 'name showDimensions showSizeSelection');
     if (!ProductList) {
         res.status(500).send({ success: false })
@@ -80,7 +80,7 @@ const getProductListByCat = async (req, res) => {
 }
 
 const getProductListBySeller = async (req, res) => {
-    await Products.find({ productOwner: req.params.id },{ status: "ACTIVE" }).populate("productOwner",'shopName')
+    await Products.find({ productOwner: req.params.id }).populate("productOwner",'shopName')
     .populate("category", 'name showDimensions showSizeSelection parentCategory')
         .then(response => {
             return res.status(201).send({ success: true, message: '', data: response,count:response.length });
@@ -90,11 +90,11 @@ const getProductListBySeller = async (req, res) => {
 }
 
 const getProductById = async (req, res) => {
-    await Products.find({ _id: req.params.id },{ status: "ACTIVE" })
+    await Products.find({ _id: req.params.id })
     .populate("productOwner",'shopName')
     .populate("category", 'name showDimensions showSizeSelection')
+    
         .then(response => {
-            const newRes = Object.fromEntries(response)
             return res.status(201).send({ success: true, message: '', data: response[0] });
         }).catch(error => {
             return res.status(500).send({ success: false, error: error.message })
@@ -102,7 +102,7 @@ const getProductById = async (req, res) => {
 }
 
 const getTodaysList = async (req, res) => {
-    const ProductList = await Products.find({ category: req.params.id },{ status: "ACTIVE" }).limit(10);
+    const ProductList = await Products.find({ category: req.params.id }).limit(10);
     if (!ProductList) {
         res.status(500).send({ success: false })
     } else {
