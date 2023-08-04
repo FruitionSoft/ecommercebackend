@@ -38,18 +38,32 @@ const sizeSchema = mongoose.Schema({
 
     width: { // PRODUCT WIDTH DATA HERE
         type: Number,
+        default: 0,
         required: false
     },
     height: { // PRODUCT HEIGHT DATA HERE
         type: Number,
+        default: 0,
+        required: false
+    },
+    chest: { // PRODUCT WIDTH DATA HERE
+        type: Number,
+        default: 0,
+        required: false
+    },
+    shoulder: { // PRODUCT WIDTH DATA HERE
+        type: Number,
+        default: 0,
         required: false
     },
     length: { // PRODUCT LENGTH DATA HERE
         type: Number,
+        default: 0,
         required: false
     },
     breadth: { // PRODUCT BREADTH DATA HERE
         type: Number,
+        default: 0,
         required: false
     },
     size_title: { // PRODUCT SIZE TITLE HERE EG. XL, XXL, M, X FOR SHIRTS AND T-SHIRTS
