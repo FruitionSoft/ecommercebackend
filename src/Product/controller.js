@@ -70,7 +70,7 @@ const searchProduct = async (req, res) => {
 }
 
 const getProductListByCat = async (req, res) => {
-    const ProductList = await Products.find({ category: req.params.id }).populate("productOwner",'shopName')
+    const ProductList = await Products.find({ category: req.params.id ,status:"ACTIVE"}).populate("productOwner",'shopName')
     .populate("category", 'name showDimensions showSizeSelection');
     if (!ProductList) {
         res.status(500).send({ success: false })
@@ -102,7 +102,7 @@ const getProductById = async (req, res) => {
 }
 
 const getTodaysList = async (req, res) => {
-    const ProductList = await Products.find({ category: req.params.id }).limit(10);
+    const ProductList = await Products.find({ category: req.params.id,status:'ACTIVE' }).limit(10);
     if (!ProductList) {
         res.status(500).send({ success: false })
     } else {
