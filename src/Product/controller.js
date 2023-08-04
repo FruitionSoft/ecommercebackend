@@ -13,7 +13,7 @@ const newProduct = (req, res) => {
 
 
 const getProductList = async (req, res) => {
-    const ProductList = await Products.find({ status: "ACTIVE" }).populate('category')
+    const ProductList = await Products.find({ status: "ACTIVE" },).populate('category').populate('size_list','_id')
     .populate("productOwner",'shopName')
     .populate("category", 'name showDimensions showSizeSelection');
     if (!ProductList) {
@@ -24,7 +24,8 @@ const getProductList = async (req, res) => {
 }
 
 const getPendingStatusProductList = async (req, res) => {
-    const ProductList = await Products.find({ status: "PENDING" }).populate('category');
+    const selectedFields = 'name price image';
+    const ProductList = await Products.find({status: "PENDING"}).select(selectedFields);
     if (!ProductList) {
         res.status(500).send({ success: false })
     } else {
@@ -33,10 +34,12 @@ const getPendingStatusProductList = async (req, res) => {
 }
 
 const getRejectedStatusProductList = async (req, res) => {
-    const ProductList = await Products.find({ status: "REJECTED" }).populate('category');
+    const selectedFields = 'name image rejectedReason';
+    const ProductList = await Products.find({status: "REJECTED"}).select(selectedFields);
     if (!ProductList) {
         res.status(500).send({ success: false })
     } else {
+       
         res.status(200).send({ success: true, message: '', data: ProductList });
     }
 }
@@ -70,8 +73,8 @@ const searchProduct = async (req, res) => {
 }
 
 const getProductListByCat = async (req, res) => {
-    const ProductList = await Products.find({ category: req.params.id ,status:"ACTIVE"}).populate("productOwner",'shopName')
-    .populate("category", 'name showDimensions showSizeSelection');
+    const selectedFields = 'name price image';
+    const ProductList = await Products.find({ category: req.params.id ,status:"ACTIVE"}).select(selectedFields);
     if (!ProductList) {
         res.status(500).send({ success: false })
     } else {

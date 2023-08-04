@@ -25,28 +25,7 @@ const productSchema = mongoose.Schema({
         type: Number,
         default: 0
     },
-    width: {
-        type: Number,
-        required: true
-    },
-    weight: {
-        type: Number
-    },
-    weightType: {
-        type: String
-    },
-    height: {
-        type: Number,
-        required: true
-    },
-    whType: {
-        type: String,
-        default: ""
-    },
-    deliveryPrice: {
-        type: Number,
-        default: 0
-    },
+    
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
@@ -69,14 +48,6 @@ const productSchema = mongoose.Schema({
         type: Boolean,
         default: false
     },
-    isPortrait: {
-        type: Boolean,
-        default: false
-    },
-    imageType: {
-        type: String,
-        required: true
-    },
     showDimensions: {
         type: Boolean,
         default: false
@@ -89,7 +60,7 @@ const productSchema = mongoose.Schema({
         type: String,
         default: ""
     },
-    imageCode: String,
+    imageCode: Array(String),
     status: {
         type: String,
         default: "PENDING"
@@ -99,7 +70,7 @@ const productSchema = mongoose.Schema({
         required: false
     },
     size_list:{
-        type:[mongoose.Schema.Types.ObjectId],
+        type:Array(mongoose.Schema.Types.ObjectId),
         ref: 'Size',
         required: true
     }
