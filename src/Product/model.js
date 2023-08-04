@@ -97,6 +97,11 @@ const productSchema = mongoose.Schema({
     rejectedReason : {
         type: String,
         required: false
+    },
+    size_list:{
+        type:[mongoose.Schema.Types.ObjectId],
+        ref: 'Size',
+        required: true
     }
 })
 
