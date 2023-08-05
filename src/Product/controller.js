@@ -1,5 +1,6 @@
 const Products = require('./model');
 const mongoose = require('mongoose');
+const {successHandler} = require('../../utils/utils')
 
 const newProduct = (req, res) => {
     console.log(req.body)
@@ -19,7 +20,7 @@ const getProductList = async (req, res) => {
     if (!ProductList) {
         res.status(500).send({ success: false })
     } else {
-        res.status(201).send({ success: true, message: '', data: ProductList });
+        successHandler(200,"Success",ProductList,res)
     }
 }
 

@@ -74,11 +74,11 @@ const deleteCategory = async (req, res) => {
 const deleteImageFromAWS = async (req, res) => {
     try {
         let s3bucket = new AWS.S3({
-            accessKeyId: "AKIAWCYLG2EKSGW4QTNB",
-            secretAccessKey: "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",
-            Bucket: "eashaproductsbucket",
+            accessKeyId: "AKIAWCYLG2EKSPKMJY6W",
+            secretAccessKey: "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",
+            Bucket: "clothproject",
         });
-        var params = { Bucket: "eashaproductsbucket", Key: req.body.key };
+        var params = { Bucket: "clothproject", Key: req.body.key };
         s3bucket.deleteObject(params, function (err, data) {
             console.log(err)
             console.log(data)
