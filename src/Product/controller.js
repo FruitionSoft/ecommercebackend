@@ -72,13 +72,29 @@ const searchProduct = async (req, res) => {
     }
 }
 
+// const getProductListByCat = async (req, res) => {
+//     const selectedFields = 'name price image';
+//     const ProductList = await Products.find({ category: req.params.id ,status:"ACTIVE"}).select(selectedFields);
+//     if (!ProductList) {
+//         res.status(500).send({ success: false })
+//     } else {
+//         res.status(200).send({ success: true, message: '', data: ProductList ,count: ProductList.length});
+//     }
+// }
+
 const getProductListByCat = async (req, res) => {
-    const selectedFields = 'name price image';
-    const ProductList = await Products.find({ category: req.params.id ,status:"ACTIVE"}).select(selectedFields);
-    if (!ProductList) {
-        res.status(500).send({ success: false })
+    if(!mongoose.isValidObjectId(req.params.id)){
+          return res.status(400).json({ message: 'Invalid category ID' });
     } else {
-        res.status(201).send({ success: true, message: '', data: ProductList ,count: ProductList.length});
+    const selectedFields = 'name price image category';
+    const ProductList = await Products.find({ category: req.params.id  ,status:"ACTIVE"}).select(selectedFields)
+    
+    if(ProductList){
+       return res.status(200).send({ success: true, message: '', data: ProductList ,count: ProductList.length});
+    }
+    else{
+        return res.status(500).json({ message: 'Internal server error' })
+    }
     }
 }
 
