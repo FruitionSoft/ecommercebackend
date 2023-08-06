@@ -160,7 +160,7 @@ app.put(`${API}/category/:id`, editCategory);
 app.get(`${API}/category/listbypid/:id`, getCategoryListByPID)
 
 
-app.put(`${API}/images/aws`, deleteImageFromAWS);
+app.put(`${API}/images/aws/delete`, deleteImageFromAWS);
 
 //Order
 app.post(`${API}/order/new`, newOrder);
