@@ -13,15 +13,42 @@ const newProduct = (req, res) => {
 }
 
 
+// const getProductList = async (req, res) => {
+//     const ProductList = await Products.find({ status: "ACTIVE" },).populate('category').populate('size_list','_id')
+//     .populate("productOwner",'shopName')
+//     .populate("category", 'name showDimensions showSizeSelection');
+//     if (!ProductList) {
+//         res.status(500).send({ success: false })
+//     } else {
+//         successHandler(200,"Success",ProductList,res)
+//     }
+// }
+
 const getProductList = async (req, res) => {
-    const ProductList = await Products.find({ status: "ACTIVE" },).populate('category').populate('size_list','_id')
-    .populate("productOwner",'shopName')
-    .populate("category", 'name showDimensions showSizeSelection');
-    if (!ProductList) {
-        res.status(500).send({ success: false })
-    } else {
-        successHandler(200,"Success",ProductList,res)
-    }
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+
+  const ProductList = await Products.find({ status: "ACTIVE" }).populate('category').populate('size_list','_id')
+  .skip((page - 1) * limit)
+  .limit(limit)
+  .exec();
+
+try {
+  const totalCount = await Products.countDocuments({ status: "ACTIVE" });
+  const totalPages = Math.ceil(totalCount / limit);
+  res.json({
+    success: true,
+    message: 'Product list retrieved successfully',
+    data: ProductList,
+    pagination: {
+      totalProducts: totalCount,
+      totalPages: totalPages,
+      currentPage: page,
+    },
+  });
+} catch (error) {
+    res.status(500).json({ success: false, message: 'Error fetching product list', error });
+  }
 }
 
 const getPendingStatusProductList = async (req, res) => {
@@ -84,14 +111,28 @@ const searchProduct = async (req, res) => {
 // }
 
 const getProductListByCat = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+
+    const totalCount = await Products.countDocuments({ category: req.params.id  ,status:"ACTIVE"});
+    const totalPages = Math.ceil(totalCount / limit);
     if(!mongoose.isValidObjectId(req.params.id)){
           return res.status(400).json({ message: 'Invalid category ID' });
     } else {
     const selectedFields = 'name price image category';
     const ProductList = await Products.find({ category: req.params.id  ,status:"ACTIVE"}).select(selectedFields)
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .exec();
     
     if(ProductList){
-       return res.status(200).send({ success: true, message: '', data: ProductList ,count: ProductList.length});
+       return res.status(200).send({ success: true, message: '', data: ProductList ,
+       pagination: {
+        totalProducts: totalCount,
+        totalPages: totalPages,
+        currentPage: page,
+      },});
     }
     else{
         return res.status(500).json({ message: 'Internal server error' })
@@ -100,10 +141,22 @@ const getProductListByCat = async (req, res) => {
 }
 
 const getProductListBySeller = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const totalCount = await Products.countDocuments({ productOwner: req.params.id  ,status:"ACTIVE"});
+    const totalPages = Math.ceil(totalCount / limit);
     await Products.find({ productOwner: req.params.id }).populate("productOwner",'shopName')
     .populate("category", 'name showDimensions showSizeSelection parentCategory')
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .exec()
         .then(response => {
-            return res.status(201).send({ success: true, message: '', data: response,count:response.length });
+            return res.status(201).send({ success: true, message: '', data: response,
+            pagination: {
+                totalProducts: totalCount,
+                totalPages: totalPages,
+                currentPage: page,
+              } });
         }).catch(error => {
             return res.status(500).send({ success: false, error: error.message })
         })
@@ -122,11 +175,25 @@ const getProductById = async (req, res) => {
 }
 
 const getTodaysList = async (req, res) => {
-    const ProductList = await Products.find({ category: req.params.id,status:'ACTIVE' }).limit(10);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const totalCount = await Products.countDocuments({ category: req.params.id ,status:"ACTIVE"});
+    const totalPages = Math.ceil(totalCount / limit);
+    const ProductList = await Products.find({ category: req.params.id,status:'ACTIVE' })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .exec()
+
     if (!ProductList) {
         res.status(500).send({ success: false })
     } else {
-        res.status(201).send({ success: true, message: '', data: ProductList});
+        res.status(201).send({ success: true, message: '', data: ProductList,
+        pagination: {
+            totalProducts: totalCount,
+            totalPages: totalPages,
+            currentPage: page,
+          }
+        });
     }
 }
 
@@ -210,5 +277,6 @@ module.exports = {
     deleteAllProduct,
     getProductListBySeller,
     getPendingStatusProductList,
-    getRejectedStatusProductList
+    getRejectedStatusProductList,
+    
 };
