@@ -149,17 +149,22 @@ const deleteOrder = async (req, res) => {
 const newOrder = async (req, res) => {
     try {
         let output = [];
+        let orderItemList = [];
         await Promise.all(req.body.orderItems.map(async item => {
             const newOrderItem = new OrderItem({
                 product: item.productId,
                 quantity: item.quantity
             });
             let result = await newOrderItem.save();
-            let ordersCount = await Order.find().count();
             const orderItemIdsResolved = await result._id;
+            orderItemList.push(orderItemIdsResolved)
+            
+        }))
+        let ordersCount = await Order.find().count();
             const orderId = `#ORDHNDMDANDR${moment().format("DDMMYY")}${("000" + ordersCount).slice(-4)}`;
+            console.log(orderItemList)
             const newOrder = new Order({
-                orderItems: orderItemIdsResolved,
+                orderItems: orderItemList,
                 addressId: req.body.addressId,
                 phone: req.body.phone,
                 totalPrice: req.body.totalPrice,
@@ -170,7 +175,7 @@ const newOrder = async (req, res) => {
                 user: req.body.user,
                 orderId: orderId,
                 orderIdFromApp: req.body.orderIdFromApp,
-                productOwner: item.productOwner
+        
             });
             console.log(newOrder)
             await newOrder.save().then(response => {
@@ -179,7 +184,6 @@ const newOrder = async (req, res) => {
                 console.log(error)
                 output.push(error);
             })
-        }))
         let TokenBody = {
             "requestType": "Payment",
             "mid": process.env.MID_DEV,

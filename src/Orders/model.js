@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
 const orderSchema = mongoose.Schema({
-    orderItems: [{
+    orderItems: Array({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'OrderItem',
         required:true
-    }],
+    }),
     addressId: {type: mongoose.Schema.Types.ObjectId, ref: 'Address'},
     phone: String,
     status: {type:String, default: 'PENDING'},
