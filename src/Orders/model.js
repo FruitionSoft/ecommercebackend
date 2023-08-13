@@ -19,7 +19,7 @@ const orderSchema = mongoose.Schema({
     processImage: [{type: String}],
     dateOrdered: {type: Date, default: Date.now},
     expDelDate: {type: Date},
-    productOwner: {type: mongoose.Schema.Types.ObjectId},
+    productOwner: Array(mongoose.Schema.Types.ObjectId),
     orderId: {type: String, required: true},
     orderIdFromApp: {type: String, required: true},
     trackId: {type: String},

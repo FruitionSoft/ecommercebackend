@@ -175,7 +175,7 @@ const newOrder = async (req, res) => {
                 user: req.body.user,
                 orderId: orderId,
                 orderIdFromApp: req.body.orderIdFromApp,
-        
+                productOwner:req.body.productOwner
             });
             console.log(newOrder)
             await newOrder.save().then(response => {
