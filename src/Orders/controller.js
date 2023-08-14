@@ -1,5 +1,6 @@
 const Order = require('./model');
 const OrderItem = require('../OrderItems/model');
+const Product = require('../Product/model');
 const mongoose = require('mongoose');
 const moment = require("moment");
 const { getPaytmToken } = require("../services/paytmToken");
@@ -145,11 +146,18 @@ const deleteOrder = async (req, res) => {
         res.status(500).send({ success: false, message: "Bad request" })
     }
 }
+const addNumbers=(a, b) =>{
+    return a + b;
+  }
 
 const newOrder = async (req, res) => {
     try {
         let output = [];
         let orderItemList = [];
+        let totalPrice= [];
+
+
+        
         await Promise.all(req.body.orderItems.map(async item => {
             const newOrderItem = new OrderItem({
                 product: item.productId,
@@ -160,6 +168,17 @@ const newOrder = async (req, res) => {
             orderItemList.push(orderItemIdsResolved)
             
         }))
+        await Promise.all(req.body.orderItems.map(async item => {
+            const res =await Product.find({_id:item.productId})
+            const result=res[0].price*item.quantity
+            totalPrice.push(result)
+            console.log(totalPrice);
+           
+            
+        }))
+
+        const sum =await totalPrice.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+
         let ordersCount = await Order.find().count();
             const orderId = `#ORDHNDMDANDR${moment().format("DDMMYY")}${("000" + ordersCount).slice(-4)}`;
             console.log(orderItemList)
@@ -167,9 +186,9 @@ const newOrder = async (req, res) => {
                 orderItems: orderItemList,
                 addressId: req.body.addressId,
                 phone: req.body.phone,
-                totalPrice: req.body.totalPrice,
+                totalPrice: sum,
                 deliveryPrice: req.body.deliveryPrice,
-                subTotal: req.body.subTotal,
+                subTotal: sum,
                 amountPaid: req.body.amountPaid,
                 amountDue: req.body.amountDue,
                 user: req.body.user,
