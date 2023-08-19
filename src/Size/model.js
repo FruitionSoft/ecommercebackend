@@ -79,6 +79,11 @@ const sizeSchema = mongoose.Schema({
         type: Array(mongoose.Schema.Types.ObjectId),
         required: true,
         ref:'Category'
+    },
+    main_category_id: { // THIS IS THE SUB CATEGORY TYPE ID EG. T-SHIRT
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref:'MainCategory'
     }
 })
 

@@ -230,7 +230,7 @@ app.get(`${API}/review/:id`, getReviewByProductId);
 app.post(`${API}/review/new`, addNewReview);
 
 //admin
-app.get(`${API}/admin/analytics/:id`, adminAnalytics);
+app.post(`${API}/admin/analytics/:id`, adminAnalytics);
 app.get(`${API}/admin/seller/list`, getSellerList);
 app.get(`${API}/deleteAllProduct`, deleteAllProduct)
 app.get(`${API}/seller/earnings/:id`, getSellerEarningAnalytics);

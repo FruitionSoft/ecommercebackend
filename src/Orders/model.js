@@ -17,7 +17,7 @@ const orderSchema = mongoose.Schema({
     amountPaid: {type: Number},
     amountDue: {type: Number},
     processImage: [{type: String}],
-    dateOrdered: {type: Date, default: Date.now},
+    dateOrdered: {type: Date},
     expDelDate: {type: Date},
     productOwner: Array(mongoose.Schema.Types.ObjectId),
     orderId: {type: String, required: true},
