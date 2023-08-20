@@ -1,6 +1,6 @@
 const { AddressData } = require('./model');
 const mongoose =require("mongoose")
-const CITY_LIST = require("../../utils/indianCityList.json");
+const CITY_LIST = require("../../utils/indianCityList");
 
 const addaddr = async(req, res) => {
         const addr = new AddressData(req.body);
