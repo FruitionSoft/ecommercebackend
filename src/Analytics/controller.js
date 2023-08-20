@@ -86,6 +86,7 @@ const adminAnalytics = async (req, res) => {
         };
       }
     orders = await Order.find(query);
+    
     let shipment = orders.filter((x) => x.status === "SHIPMENT");
     let pending = orders.filter((x) => x.status === "PENDING");
     let inprocess = orders.filter((x) => x.status === "PROCESSING");
@@ -154,6 +155,7 @@ const adminAnalytics = async (req, res) => {
     ];
     //get income by month and year
     let incomeList = orders;
+    console.log(incomeList)
     list.incomeData = await getIncomeData(incomeList, req.body.type);
     list.analytics = totalAnalytics;
     console.log(list.incomeData);
@@ -201,6 +203,7 @@ function getIncomeData(orders, type) {
   });
   return incomeList;
 }
+
 
 const getSellerList = async (req, res) => {
   await User.find({ isAdmin: true, isSA: false })
