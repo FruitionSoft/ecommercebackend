@@ -253,7 +253,6 @@ const adminAnalytics = async (req, res) => {
     orders = await Order.find(query);
 
 
-
     let shipment = orders.filter((x) => x.status === "SHIPMENT");
     let pending = orders.filter((x) => x.status === "PENDING");
     let inprocess = orders.filter((x) => x.status === "PROCESSING");
@@ -322,7 +321,6 @@ const adminAnalytics = async (req, res) => {
     ];
     //get income by month and year
     let incomeList = orders;
-    // console.log(incomeList)
     list.incomeData = await getIncomeData(incomeList, req.body.type,req.params.id);
     list.analytics = totalAnalytics;
     return res
@@ -381,6 +379,7 @@ function getIncomeData(orders, type,paramsId) {
     list.map((item) => {
     if (totalOrderData) {
       let filteredData;
+      let sum;
       if (type == "last_seven_days") {
         filteredData = totalOrderData.filter(
           (x) => moment(x.dateOrdered).format("DD-MM-YYYY") == item
@@ -419,24 +418,29 @@ function getIncomeData(orders, type,paramsId) {
       }
       if (filteredData?.length > 0) {
         if (filteredData.length > 1) {
-          let sum = filteredData.reduce((a, b) => a + b["amountPaid"], 0);
+          sum = filteredData.reduce((a, b) => a + b["amountPaid"], 0);
+          console.log("sum",sum)
           return incomeList.push({
             value: sum,
             label: type=="this_month" || type=="last_month" || type =="last_three_month" ||type =="yearly" ?item.count:item,
-            frontColor: (sum <="10000" && "#d9534f") || (sum <="10000" &&sum <="50000" && "#177AD5") || (sum >="50000" && "#5cb85c")  ,
+            frontColor: (sum <=10000 && "#d9534f") || ((sum >=10000 && sum <=50000) && "#177AD5") || (sum >=50000 && "#5cb85c")  ,
           });
         } else {
+          sum = filteredData.reduce((a, b) => a + b["amountPaid"], 0);
+
+          console.log("sum1",sum)
           return incomeList.push({
             value: filteredData[0].amountPaid,
             label: type=="this_month" || type=="last_month" || type =="last_three_month" ||type =="yearly" ?item.count:item,
-            frontColor: (sum <="10000" && "#d9534f") || (sum <="10000" &&sum <="50000" && "#177AD5") || (sum >="50000" && "#5cb85c"),
+            frontColor: (sum <=10000 && "#d9534f") || (sum >=10000 &&sum <=50000 && "#177AD5") || (sum >=50000 && "#5cb85c"),
           });
         }
       } else {
+        console.log("sum2",sum)
         return incomeList.push({
           value: 0,
           label: type=="this_month" || type=="last_month" || type =="last_three_month" ||type =="yearly" ?item.count:item,
-          frontColor: (sum <="10000" && "#d9534f") || (sum <="10000" &&sum <="50000" && "#177AD5") || (sum >="50000" && "#5cb85c"),
+          frontColor: "",
         });
       }
     }
