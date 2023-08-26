@@ -6,6 +6,112 @@ const Fund = require("../Funds/model");
 const Business = require("../BusinessData/model");
 const mongoose = require("mongoose");
 const moment = require("moment");
+const { query } = require("express");
+
+function getWeeksArrayForCurrentMonth() {
+  const currentMonthStart = moment().startOf("month");
+  const currentMonthEnd = moment().endOf("month");
+
+  const weeksArray = [];
+
+  let currentDate = currentMonthStart.clone();
+
+  let weekCount = 1; // Initialize the week count
+
+  while (currentDate.isSameOrBefore(currentMonthEnd)) {
+    const weekStart = currentDate.clone().startOf("week");
+    const weekEnd = currentDate.clone().endOf("week");
+
+    weeksArray.push({
+      start: weekStart,
+      end: weekEnd,
+      count: `week ${weekCount}`, // Add the week count
+    });
+
+    currentDate.add(1, "week");
+    weekCount++; // Increment the week count
+  }
+
+  return weeksArray;
+}
+
+function getWeeksArrayForLastMonth(){
+  const currentMonthStart = moment().subtract(1, 'month').startOf("month");
+  const currentMonthEnd = moment().subtract(1, 'month').endOf("month");
+
+  const weeksArray = [];
+
+  let currentDate = currentMonthStart.clone();
+
+  let weekCount = 1; // Initialize the week count
+
+  while (currentDate.isSameOrBefore(currentMonthEnd)) {
+    const weekStart = currentDate.clone().startOf("week");
+    const weekEnd = currentDate.clone().endOf("week");
+
+    weeksArray.push({
+      start: weekStart,
+      end: weekEnd,
+      count: `week ${weekCount}`, // Add the week count
+    });
+
+    currentDate.add(1, "week");
+    weekCount++; // Increment the week count
+  }
+
+  return weeksArray;
+
+}
+
+function getLastThreeMonths() {
+  const today = moment();
+  const lastMonthEnd = today.clone().subtract(1, 'month').endOf('month');
+  const twoMonthsAgoEnd = today.clone().subtract(2, 'months').endOf('month');
+  const threeMonthsAgoEnd = today.clone().subtract(3, 'months').endOf('month');
+
+  const months = [
+    {
+      start: threeMonthsAgoEnd.clone().startOf('month'),
+      end: threeMonthsAgoEnd,
+      count: threeMonthsAgoEnd.format('MMMM'),
+    },
+    {
+      start: twoMonthsAgoEnd.clone().startOf('month'),
+      end: twoMonthsAgoEnd,
+      count: twoMonthsAgoEnd.format('MMMM'),
+    },
+    {
+      start: lastMonthEnd.clone().startOf('month'),
+      end: lastMonthEnd,
+      count: lastMonthEnd.format('MMMM'),
+    },
+  ];
+
+  return months;
+}
+
+function getAllMonthsInYear() {
+  const months = [];
+  const currentDate = new Date(); // Get the current date
+  const year = currentDate.getFullYear();
+  console.log(year)
+
+  for (let month = 0; month < 12; month++) {
+    const monthStart = moment({ year, month, day: 1 });
+    const monthEnd = monthStart.clone().endOf('month');
+    const monthName = monthStart.format('MMMM');
+    
+    months.push({
+      start: monthStart,
+      end: monthEnd,
+      count: monthName
+    });
+  }
+  
+  return months;
+}
+
+
 
 const adminAnalytics = async (req, res) => {
   try {
@@ -15,6 +121,7 @@ const adminAnalytics = async (req, res) => {
     let orders;
     // GET CURRENT DATE
     const currentDate = new Date();
+
     // GET CURRENT MONTH DETAILS
     const startOfMonth = new Date(
       currentDate.getFullYear(),
@@ -43,16 +150,56 @@ const adminAnalytics = async (req, res) => {
       currentDate.getMonth() - 3,
       1
     );
+
+    const endOfLastThreeMonths = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() - 1,
+      30
+    );
+
+    // GET YEAR 
+    const getYearFirstDay = new Date(
+      currentDate.getFullYear(),
+      0, 
+      2   
+    );
+
+    const getYearLastDay = new Date(
+      currentDate.getFullYear()+1,
+      0, 
+      1
+    );
+
     // GET LAST WEEK DATA
     const startOfLastWeek = new Date(currentDate);
     startOfLastWeek.setDate(currentDate.getDate() - 7);
+
+    //TODAY
+    const startOfToday = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      currentDate.getDate()
+    );
     const endOfToday = new Date(
       currentDate.getFullYear(),
       currentDate.getMonth(),
-      currentDate.getDate(),
+      currentDate.getDate() + 1,
       23,
       59,
       59
+    );
+
+    //YESTERDAY
+
+    const startOfYesterday = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      currentDate.getDate() - 1
+    );
+    const endOfYesterday = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      currentDate.getDate()
     );
     if (req.body.type === "date") {
       query = {
@@ -66,6 +213,18 @@ const adminAnalytics = async (req, res) => {
         dateOrdered: { $gte: startOfMonth, $lt: endOfMonth },
         // Replace the date range with your desired date range
       };
+    } else if (req.body.type === "today") {
+      query = {
+        productOwner: req.params.id, // Replace with the desired status value
+        dateOrdered: { $gte: startOfToday, $lt: endOfToday },
+        // Replace the date range with your desired date range
+      };
+    } else if (req.body.type === "yesterday") {
+      query = {
+        productOwner: req.params.id, // Replace with the desired status value
+        dateOrdered: { $gte: startOfYesterday, $lt: endOfYesterday },
+        // Replace the date range with your desired date range
+      };
     } else if (req.body.type === "last_month") {
       query = {
         productOwner: req.params.id, // Replace with the desired status value
@@ -75,18 +234,26 @@ const adminAnalytics = async (req, res) => {
     } else if (req.body.type === "last_three_month") {
       query = {
         productOwner: req.params.id, // Replace with the desired status value
-        dateOrdered: { $gte: startOfLastThreeMonths, $lt: endOfLastMonth },
+        dateOrdered: { $gte: startOfLastThreeMonths, $lt: endOfLastThreeMonths },
+        // Replace the date range with your desired date range
+      };
+    }else if (req.body.type === "yearly") {
+      query = {
+        productOwner: req.params.id, // Replace with the desired status value
+        dateOrdered: { $gte: getYearFirstDay, $lt: getYearLastDay },
         // Replace the date range with your desired date range
       };
     } else if (req.body.type === "last_seven_days") {
-        query = {
-          productOwner: req.params.id, // Replace with the desired status value
-          dateOrdered: { $gte: startOfLastWeek, $lt: endOfToday },
-          // Replace the date range with your desired date range
-        };
-      }
+      query = {
+        productOwner: req.params.id, // Replace with the desired status value
+        dateOrdered: { $gte: startOfLastWeek, $lt: endOfToday },
+        // Replace the date range with your desired date range
+      };
+    }
     orders = await Order.find(query);
-    
+
+
+
     let shipment = orders.filter((x) => x.status === "SHIPMENT");
     let pending = orders.filter((x) => x.status === "PENDING");
     let inprocess = orders.filter((x) => x.status === "PROCESSING");
@@ -151,14 +318,13 @@ const adminAnalytics = async (req, res) => {
         count: ordersComplete,
         type: "Total",
         color: "#cd84f1",
-      }
+      },
     ];
     //get income by month and year
     let incomeList = orders;
-    console.log(incomeList)
-    list.incomeData = await getIncomeData(incomeList, req.body.type);
+    // console.log(incomeList)
+    list.incomeData = await getIncomeData(incomeList, req.body.type,req.params.id);
     list.analytics = totalAnalytics;
-    console.log(list.incomeData);
     return res
       .status(200)
       .send({ success: true, message: "", data: list, body: req.body });
@@ -168,42 +334,115 @@ const adminAnalytics = async (req, res) => {
   }
 };
 
-function getIncomeData(orders, type) {
+function getIncomeData(orders, type,paramsId) {
+  let id = paramsId;
   let list;
-  if(type == "last_seven_days") {
-    list = [moment().subtract(6, "days").format("DD-MM-YYYY"), moment().subtract(5, "days").format("DD-MM-YYYY"), moment().subtract(4, "days").format("DD-MM-YYYY"), moment().subtract(3, "days").format("DD-MM-YYYY"), moment().subtract(2, "days").format("DD-MM-YYYY"), moment().subtract(1, "days").format("DD-MM-YYYY"), moment().format("DD-MM-YYYY")];
-  }else {
-    list = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+  if (type == "last_seven_days") {
+    list = [
+      moment().subtract(6, "days").format("DD-MM-YYYY"),
+      moment().subtract(5, "days").format("DD-MM-YYYY"),
+      moment().subtract(4, "days").format("DD-MM-YYYY"),
+      moment().subtract(3, "days").format("DD-MM-YYYY"),
+      moment().subtract(2, "days").format("DD-MM-YYYY"),
+      moment().subtract(1, "days").format("DD-MM-YYYY"),
+      moment().format("DD-MM-YYYY"),
+    ];
+  } else if (type == "today") {
+    list = [moment().format("DD-MM-YYYY")];
+  } else if (type == "yesterday") {
+    list = [moment().subtract(1, "days").format("DD-MM-YYYY")];
+  } else if (type == "this_month") {
+    list = getWeeksArrayForCurrentMonth()
+  }else if (type == "last_month") {
+    list = getWeeksArrayForLastMonth()
+  }else if (type == "last_three_month") {
+    list = getLastThreeMonths()
+  }else if (type == "yearly") {
+    list = getAllMonthsInYear()
+  } else {
+    list = [
+      "01",
+      "02",
+      "03",
+      "04",
+      "05",
+      "06",
+      "07",
+      "08",
+      "09",
+      "10",
+      "11",
+      "12",
+    ];
   }
   let incomeList = new Array();
   const totalOrderData = orders;
-  list.map((item) => {
+
+    list.map((item) => {
     if (totalOrderData) {
       let filteredData;
-      if(type == "last_seven_days") {
+      if (type == "last_seven_days") {
         filteredData = totalOrderData.filter(
-            (x) => moment(x.dateOrdered).format("DD-MM-YYYY") == item
-          );
+          (x) => moment(x.dateOrdered).format("DD-MM-YYYY") == item
+        );
+      } else if (type == "today") {
+        filteredData = totalOrderData.filter(
+          (x) => moment(x.dateOrdered).format("DD-MM-YYYY") == item
+        );
+      } else if (type == "yesterday") {
+        filteredData = totalOrderData.filter(
+          (x) => moment(x.dateOrdered).format("DD-MM-YYYY") == item
+        );
+      } else if (type == "this_month") {
+        console.log(moment(item.start).format("DD-MM-YYYY"))
+        console.log(moment(item.end).format("DD-MM-YYYY"))
+        filteredData = totalOrderData.filter(
+          (x) => moment(x.dateOrdered).format("DD-MM-YYYY") >= moment(item.start).format("DD-MM-YYYY") && moment(x.dateOrdered).format("DD-MM-YYYY") <=moment(item.end).format("DD-MM-YYYY")
+        );
+      }else if (type == "last_month") {
+        
+        filteredData = totalOrderData.filter(
+          (x) => moment(x.dateOrdered).format("DD-MM-YYYY") >= moment(item.start).format("DD-MM-YYYY") && moment(x.dateOrdered).format("DD-MM-YYYY") <=moment(item.end).format("DD-MM-YYYY")
+        );
+      }else if (type == "last_three_month") {
+        filteredData = totalOrderData.filter(
+          x => moment(x.dateOrdered).isBetween(item.start, item.end, null, '[]')
+        );
+      }else if (type == "yearly") {
+        filteredData = totalOrderData.filter(
+          x => moment(x.dateOrdered).isBetween(item.start, item.end, null, '[]')
+        );
       }else {
         filteredData = totalOrderData.filter(
-            (x) => moment(x.dateOrdered).format("MM") == item
-          );
+          (x) => moment(x.dateOrdered).format("MM") == item
+        );
       }
       if (filteredData?.length > 0) {
         if (filteredData.length > 1) {
           let sum = filteredData.reduce((a, b) => a + b["amountPaid"], 0);
-          return incomeList.push({value: sum, label: item, frontColor: '#177AD5'});
+          return incomeList.push({
+            value: sum,
+            label: type=="this_month" || type=="last_month" || type =="last_three_month" ||type =="yearly" ?item.count:item,
+            frontColor: (sum <="10000" && "#d9534f") || (sum <="10000" &&sum <="50000" && "#177AD5") || (sum >="50000" && "#5cb85c")  ,
+          });
         } else {
-          return incomeList.push({value: filteredData[0].amountPaid, label: item, frontColor: '#177AD5'});
+          return incomeList.push({
+            value: filteredData[0].amountPaid,
+            label: type=="this_month" || type=="last_month" || type =="last_three_month" ||type =="yearly" ?item.count:item,
+            frontColor: (sum <="10000" && "#d9534f") || (sum <="10000" &&sum <="50000" && "#177AD5") || (sum >="50000" && "#5cb85c"),
+          });
         }
       } else {
-        return incomeList.push({value: 0, label: item, frontColor: '#177AD5'});
+        return incomeList.push({
+          value: 0,
+          label: type=="this_month" || type=="last_month" || type =="last_three_month" ||type =="yearly" ?item.count:item,
+          frontColor: (sum <="10000" && "#d9534f") || (sum <="10000" &&sum <="50000" && "#177AD5") || (sum >="50000" && "#5cb85c"),
+        });
       }
     }
   });
   return incomeList;
 }
-
 
 const getSellerList = async (req, res) => {
   await User.find({ isAdmin: true, isSA: false })
