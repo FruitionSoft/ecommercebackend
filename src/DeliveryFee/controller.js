@@ -1,6 +1,6 @@
 const { DeliveryData } = require('./model');
 const mongoose = require("mongoose");
-const {countryList} = require("../../clist");
+const {IndianStates} = require("../../utils/IndianStates");
 
 const addDelv = async(req, res) => {
         const Delv = new DeliveryData(req.body);
@@ -55,10 +55,20 @@ const deleteAllList = async (req, res) => {
     }
     
 }
+
+const getCityByState = async (req, res) => {
+    let list = IndianStates.filter((x) => x.State === "Tamil Nadu");
+    let listData = {
+        city: list.map(x => {return x.District}),
+        state: ["Tamil Nadu"]
+    }
+    return res.status(200).send({ success: true, message: "", data: listData });
+}
 module.exports = {
     addDelv,
     DelvList,
     editDelv,
     DelvListAll,
-    deleteAllList
+    deleteAllList,
+    getCityByState
 }

@@ -19,7 +19,7 @@ const { addCart,editCart, CartList, deleteCartProduct, CartProductList, deleteCa
 const { getReviewByProductId, addNewReview } = require('./src/Review/controller');
 const { addFav, FavList, deleteFavProduct, FavDetailedList } = require('./src/Favoruit/controller');
 const { addaddr, addrList, deleteaddr, editAddress, addrById, getCityState } = require('./src/Address/controller');
-const { addDelv, DelvList, editDelv, DelvListAll, deleteAllList } = require('./src/DeliveryFee/controller');
+const { addDelv, DelvList, editDelv, DelvListAll, deleteAllList, getCityByState } = require('./src/DeliveryFee/controller');
 const { adminAnalytics, getSellerList, getSellerEarningAnalytics } = require("./src/Analytics/controller");
 const { mascelinous } = require("./src/Constants/mascelinous");
 const { newSize, getSizeList, getSizeById, editSize, deleteSize,getSizeByCategoryID } = require("./src/Size/controller");
@@ -213,6 +213,7 @@ app.put(`${API}/delivery/:id`, editDelv);
 app.get(`${API}/delivery/:id`, DelvList);
 app.get(`${API}/delivery/list/all`, DelvListAll);
 app.delete(`${API}/delivery/list/delete`, deleteAllList);
+app.get(`${API}/delivery/city/list`, getCityByState)
 
 //user
 app.get(`${API}/refershToken/:id`,refreshToken);
