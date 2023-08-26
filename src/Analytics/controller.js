@@ -419,7 +419,6 @@ function getIncomeData(orders, type,paramsId) {
       if (filteredData?.length > 0) {
         if (filteredData.length > 1) {
           sum = filteredData.reduce((a, b) => a + b["amountPaid"], 0);
-          console.log("sum",sum)
           return incomeList.push({
             value: sum,
             label: type=="this_month" || type=="last_month" || type =="last_three_month" ||type =="yearly" ?item.count:item,
@@ -428,7 +427,6 @@ function getIncomeData(orders, type,paramsId) {
         } else {
           sum = filteredData.reduce((a, b) => a + b["amountPaid"], 0);
 
-          console.log("sum1",sum)
           return incomeList.push({
             value: filteredData[0].amountPaid,
             label: type=="this_month" || type=="last_month" || type =="last_three_month" ||type =="yearly" ?item.count:item,
@@ -436,11 +434,10 @@ function getIncomeData(orders, type,paramsId) {
           });
         }
       } else {
-        console.log("sum2",sum)
         return incomeList.push({
           value: 0,
           label: type=="this_month" || type=="last_month" || type =="last_three_month" ||type =="yearly" ?item.count:item,
-          frontColor: "",
+          frontColor: "#177AD5",
         });
       }
     }
