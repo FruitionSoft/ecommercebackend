@@ -73,7 +73,19 @@ const productSchema = mongoose.Schema({
         type:Array(mongoose.Schema.Types.ObjectId),
         ref: 'Size',
         required: true
-    }
+    },
+    weight:{
+        type: Number,
+        required: true
+    },
+    weightType:{
+        type: String,
+        required: true
+    },
+    color:{
+        type:Array(String),
+        required: true
+    },
 })
 
 const Products = mongoose.model('Products', productSchema);
