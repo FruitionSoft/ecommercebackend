@@ -6,19 +6,29 @@ const moment = require("moment");
 const { getPaytmToken } = require("../services/paytmToken");
 
 const getOrderList = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const totalCount = await Order.countDocuments();
+    const totalPages = Math.ceil(totalCount / limit);
     try {
         const controllerList = await Order.find()
             .populate({
                 path: 'orderItems',
                 populate: { path: 'product' }
             })
-            .populate('user', 'name').sort({ 'dateOrdered': -1 });
-            console.log('Initialize response: ', controllerList)
+            .populate('user', 'name').sort({ 'dateOrdered': -1 })
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .exec()
         if (!controllerList) {
-            console.log(controllerList)
             return res.status(500).send({ success: false })
         } else {
-            return res.status(200).send({ success: true, message: '', data: controllerList });
+            return res.status(200).send({ success: true, message: '', data: controllerList, 
+            pagination: {
+                totalProducts: totalCount,
+                totalPages: totalPages,
+                currentPage: page,
+              } });
         }
     } catch (error) {
         return res.status(500).send({ success: false, message: "Bad request" })
