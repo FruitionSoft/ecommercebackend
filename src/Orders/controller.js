@@ -35,6 +35,30 @@ const getOrderList = async (req, res) => {
     }
 }
 
+const getOrderListByDate = async (req,res)=>{
+    query = {
+        dateOrdered: { $gte: req.body.from, $lt: req.body.to },
+      };
+    try{
+        const orderList = await Order.find(query)
+        .populate({
+            path: 'orderItems',
+            populate: { path: 'product' }
+        })
+        .populate('user', 'name').sort({ 'dateOrdered': -1 })
+        console.log(orderList.length)
+
+        if(!orderList){
+            return res.status(500).send({ success: false })
+        }else{
+            return res.status(200).send({ success: true, message: '', data: orderList,count:orderList.length})
+        }
+    }
+    catch{
+        return res.status(403).send({ success: false, message: "Bad request" })
+    }
+        
+}
 const getOrderSales = async (req, res) => {
     try {
         const orderAnalytics = await Order.aggregate([
@@ -101,6 +125,7 @@ const orderDelivered = async (req, res) => {
     }
 }
 
+
 const getOrderByUserId = async (req, res) => {
     try {
         await Order.find({ user: req.params.id, "status": { $ne: "PENDING" } }).sort({ "dateOrdered": -1 })
@@ -165,9 +190,8 @@ const newOrder = async (req, res) => {
         let output = [];
         let orderItemList = [];
         let totalPrice= [];
+        let totalWeight =[];
 
-
-        
         await Promise.all(req.body.orderItems.map(async item => {
             const newOrderItem = new OrderItem({
                 product: item.productId,
@@ -180,11 +204,10 @@ const newOrder = async (req, res) => {
         }))
         await Promise.all(req.body.orderItems.map(async item => {
             const res =await Product.find({_id:item.productId})
+            // console.log(res[0].w)
             const result=res[0].price*item.quantity
             totalPrice.push(result)
-            console.log(totalPrice);
-           
-            
+            console.log(totalPrice);   
         }))
 
         const sum =await totalPrice.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
@@ -251,6 +274,7 @@ module.exports = {
     getOrderSales,
     getOrderByUserId,
     orderPending,
-    orderDelivered
+    orderDelivered,
+    getOrderListByDate
 
 };
