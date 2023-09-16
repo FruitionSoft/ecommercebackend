@@ -76,11 +76,10 @@ const getOrderSales = async (req, res) => {
 }
 
 const getOrderByOrderId = async (req, res) => {
-    console.log(req.body.id)
-
+    console.log(req.params.id)
     try {
         console.log('done')
-        await Order.find({ orderId: req.body.id })
+        await Order.find({ orderId: req.params.id })
             .populate('user', 'name token')
             .populate({ path: 'orderItems', populate: { path: 'product' } }).populate({ path: "addressId" })
             .then(response => {
