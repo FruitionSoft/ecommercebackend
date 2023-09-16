@@ -75,7 +75,24 @@ const getOrderSales = async (req, res) => {
     }
 }
 
+const getOrderByOrderId = async (req, res) => {
+    console.log(req.body.id)
 
+    try {
+        console.log('done')
+        await Order.find({ orderId: req.body.id })
+            .populate('user', 'name token')
+            .populate({ path: 'orderItems', populate: { path: 'product' } }).populate({ path: "addressId" })
+            .then(response => {
+                console.log(response)
+                return res.status(200).send({ success: true, message: '', data: response[0] });
+            }).catch(error => {
+                res.status(500).send({ success: false, error: error.message })
+            })
+    } catch (error) {
+        res.status(500).send({ success: false, message: "Bad request" })
+    }
+}
 
 const getOrderById = async (req, res) => {
     try {
@@ -277,5 +294,6 @@ module.exports = {
     getOrderByUserId,
     orderPending,
     orderDelivered,
-    getOrderListByDate
+    getOrderListByDate,
+    getOrderByOrderId
 };

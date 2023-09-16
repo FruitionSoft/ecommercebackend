@@ -13,7 +13,7 @@ const { errorHandler } = require('./helpers/errorHandler');
 const { newProduct,getProductList, getProductListByCat, editProduct, deleteProduct, getProductById, getTodaysList, getProductAnalytics, filterByCategories, getTopPicksData, searchProduct, deleteAllProduct, getProductListBySeller, getPendingStatusProductList ,getRejectedStatusProductList} = require('./src/Product/controller');
 const { getCategoryList, addNewCategory, deleteCategory, editCategory, getCategoryNameList, getDashboarCategory, deleteImageFromAWS, getCategoryListByPID } = require('./src/Category/controller');
 const { getOrderItemList, deleteOrderItems } = require('./src/OrderItems/controller');
-const { getOrderList, newOrder, getOrderById, getOrderByUserId, editOrderStatus, deleteOrder, getOrderSales, orderPending, orderDelivered,getOrderListByDate } = require('./src/Orders/controller');
+const { getOrderList, newOrder, getOrderById, getOrderByUserId, editOrderStatus, deleteOrder, getOrderSales, orderPending, orderDelivered,getOrderListByDate,getOrderByOrderId } = require('./src/Orders/controller');
 const { getUserList, newUser, getUserById, login, editUser, getUserAnalytics, deleteUser, otpValidator, forgotPassword, generateOTP, loginAdmin, getAdminTokens, getSellerToken,refreshToken } = require('./src/Users/controller');
 const { addCart,editCart, CartList, deleteCartProduct, CartProductList, deleteCartByUser, increaseCartItem, decreaseCartItem } = require('./src/Cart/controller');
 const { getReviewByProductId, addNewReview } = require('./src/Review/controller');
@@ -165,6 +165,7 @@ app.put(`${API}/images/aws/delete`, deleteImageFromAWS);
 //Order
 app.post(`${API}/order/new`, newOrder);
 app.get(`${API}/order/:id`, getOrderById);
+app.get(`${API}/orderbyorderid`, getOrderByOrderId);
 app.get(`${API}/order/list/all`, getOrderList);
 app.delete(`${API}/order/:id`, deleteOrder);
 app.get(`${API}/order/new/analytics`, getOrderSales);
