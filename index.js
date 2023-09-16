@@ -7,6 +7,7 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const fileUpload = require('express-fileupload');
 //Modules import
 const { authJwt } = require('./helpers/jwt');
 const { errorHandler } = require('./helpers/errorHandler');
@@ -27,8 +28,9 @@ const { newBusinessData, getShopList, deleteShop, getShopById, updateShop } = re
 const { addNewChat, ChatList, updateChat } = require("./src/chat/controller");
 const { addNewMainCategory, getMainCategoryList, editMainCategory,deleteMainCategory } = require("./src/MainCategory/controller");
 const {getDimensions,NewDimensions,getDimensionsById,EditDimensions,deleteDimensions} = require("./src/Dimensions/controller");
+
 app.use(bodyParser.json({ limit: '50mb', type: 'application/json' }));
-const { uploadProduct } = require('./services/multer');
+app.use(fileUpload());
 //Bank API
 const { getBankDataById, addNewBankDetail, updateBankDetail, getPendingBankData } = require("./src/BankDetails/controller");
 //Fund API
@@ -96,7 +98,6 @@ io.on("connection", socket => {
 io.listen(3001);
 
 const fs = require("fs");
-
 //API Version
 const API = process.env.API_URL;
 //Authenticating the API

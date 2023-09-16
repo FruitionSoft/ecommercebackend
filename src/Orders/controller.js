@@ -3,7 +3,6 @@ const OrderItem = require('../OrderItems/model');
 const Product = require('../Product/model');
 const mongoose = require('mongoose');
 const moment = require("moment");
-const { getPaytmToken } = require("../services/paytmToken");
 
 const getOrderList = async (req, res) => {
     const page = parseInt(req.query.page) || 1;

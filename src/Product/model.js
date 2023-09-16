@@ -78,7 +78,7 @@ const productSchema = mongoose.Schema({
         type: Number,
         required: true
     },
-    weightType:{
+    weightType:{ // GRAM, KILO
         type: String,
         required: true
     },

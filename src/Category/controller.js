@@ -74,15 +74,14 @@ const deleteCategory = async (req, res) => {
 const deleteImageFromAWS = async (req, res) => {
     try {
         let s3bucket = await new AWS.S3({
-            accessKeyId: "AKIAWCYLG2EK33O6TPFQ",
-            secretAccessKey: "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",
-            Bucket: "clothproject"
+            accessKeyId: process.env.AWS_ACCESSKEY,
+            secretAccessKey: process.env.AWS_SECRETKEY,
+            Bucket: process.env.AWS_BUCKET
         });
         await s3bucket.config.update({
-            region: "ap-northeast-1"
+            region: process.env.AWS_REGION
         })
-        var params = { Bucket: "clothproject", Key: req.body.key };
-        const deleteResponse = await s3bucket.deleteObject({ Bucket: 'clothproject', Key: req.body.key }).promise();
+        const deleteResponse = await s3bucket.deleteObject({ Bucket: process.env.AWS_BUCKET, Key: req.body.key }).promise();
         return res.send({ data: deleteResponse, success: true })
     } catch (err) {
         return res.status(500).send({ error: err, success: false })
