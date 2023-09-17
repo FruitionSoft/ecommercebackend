@@ -165,7 +165,7 @@ app.put(`${API}/images/aws/delete`, deleteImageFromAWS);
 //Order
 app.post(`${API}/order/new`, newOrder);
 app.get(`${API}/order/:id`, getOrderById);
-app.get(`${API}/orderbyorderid`, getOrderByOrderId);
+app.get(`${API}/orderbyorderid/:id`, getOrderByOrderId);
 app.get(`${API}/order/list/all`, getOrderList);
 app.delete(`${API}/order/:id`, deleteOrder);
 app.get(`${API}/order/new/analytics`, getOrderSales);
