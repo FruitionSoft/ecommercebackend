@@ -52,7 +52,7 @@ try {
 }
 
 const getPendingStatusProductList = async (req, res) => {
-    const selectedFields = 'name price image';
+    const selectedFields = 'name price imageCode';
     const ProductList = await Products.find({status: "PENDING"}).select(selectedFields);
     if (!ProductList) {
         res.status(500).send({ success: false })
@@ -278,5 +278,6 @@ module.exports = {
     getProductListBySeller,
     getPendingStatusProductList,
     getRejectedStatusProductList,
+    seedProduct
     
 };
