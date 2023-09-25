@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const DiscountSchema = mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    },
     discountValue: {
         type: Number,
         required: true

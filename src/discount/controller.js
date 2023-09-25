@@ -3,38 +3,8 @@ const mongoose = require("mongoose");
 const schedule = require("node-schedule");
 
 const getDiscount = async (req, res) => {
-  //ACTIVE=true , CATEGORY=true
-  //ACTIVE=false , CATEGORY=false
-  //ACTIVE=false , CATEGORY=true
-  //ACTIVE=true , CATEGORY=false
-
   let DiscountList;
-  console.log("active", req.query.active, "Category", req.query.category);
-
-  switch (req.query.active) {
-    case "ACTIVE":
-      if (req.query.category === "true") {
-        DiscountList = await Discount.find({ status: "ACTIVE" }).populate(
-          "category"
-        );
-      } else {
-        DiscountList = await Discount.find({ status: "ACTIVE" });
-      }
-      break;
-    case "DEACTIVE":
-      if (req.query.category === "true") {
-        DiscountList = await Discount.find({ status: "DEACTIVE" }).populate(
-          "category"
-        );
-      } else {
-        DiscountList = await Discount.find({ status: "DEACTIVE" });
-      }
-      break;
-    default:
-      DiscountList = await Discount.find({ status: "ACTIVE" });
-      break;
-  }
-
+  DiscountList = await Discount.find();
   if (await DiscountList) {
     res.status(200).send({ success: true, message: "", data: DiscountList });
   } else {
