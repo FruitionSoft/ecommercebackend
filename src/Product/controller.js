@@ -1,6 +1,5 @@
 const Products = require("./model");
 const mongoose = require("mongoose");
-const { successHandler } = require("../../utils/utils");
 
 const newProduct = (req, res) => {
   console.log(req.body);

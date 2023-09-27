@@ -1,4 +1,5 @@
 const express = require("express");
+const moment = require("moment");
 const app = express();
 const { Router } = require("express");
 const route = new Router();
@@ -165,11 +166,13 @@ const {
   getPendingFundData,
 } = require("./src/Funds/controller");
 const schedule = require("node-schedule");
-
+const currentDate = moment();
 //CRON JOB for daily report
 // const job = schedule.scheduleJob("*/30 * * * * *", () => {
 //   console.log("Running the daily report task...", new Date());
 // });
+const formattedDate = currentDate.format("2023-09-28T01:08:00");
+console.log(formattedDate);
 
 // Chat Process
 const io = require("socket.io")();
@@ -234,7 +237,7 @@ io.on("connection", (socket) => {
 io.listen(3001);
 
 const fs = require("fs");
-const sendMail = require("./services/mail");
+const { sendMail } = require("./services/mail");
 
 //API Version
 const API = process.env.API_URL;
@@ -414,6 +417,7 @@ app.post(`${API}/seller/fund`, addNewFundDetail);
 app.put(`${API}/seller/fund/:id`, updateFundDetail);
 app.get(`${API}/seller/fundpending`, getPendingFundData);
 
+// Customer API's
 mongoose
   .connect(process.env.CONNECTION, {
     useNewUrlParser: true,

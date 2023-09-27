@@ -1,13 +1,11 @@
 const Discount = require("./model");
 const mongoose = require("mongoose");
 const schedule = require("node-schedule");
+const moment = require("moment");
+const mail = require("../../services/mail");
+const currentDate = moment();
 
 const getDiscount = async (req, res) => {
-  //ACTIVE=true , CATEGORY=true
-  //ACTIVE=false , CATEGORY=false
-  //ACTIVE=false , CATEGORY=true
-  //ACTIVE=true , CATEGORY=false
-
   let DiscountList;
   console.log("active", req.query.active, "Category", req.query.category);
 
@@ -48,6 +46,18 @@ const NewDiscount = async (req, res) => {
   discountList
     .save()
     .then((data) => {
+      console.log(data);
+      const job = schedule.scheduleJob(req.body.expDate, () => {
+        console.log(
+          "Task executed at the specific date and time.",
+          req.body.expDate
+        );
+        deleteDiscountCron(data._id, req.body.name);
+      });
+
+      job.on("run", function () {
+        console.log("Job executed.");
+      });
       res.status(201).send({ success: true, message: "Data saved" });
     })
     .catch((err) => {
@@ -100,6 +110,24 @@ const deleteDiscount = async (req, res) => {
     })
     .catch((err) => {
       return res.status(500).send({ error: err, success: false });
+    });
+};
+
+const deleteDiscountCron = async (id, name) => {
+  const { discountDeletedMsg } = mail;
+  console.log(id, name);
+  await Discount.findByIdAndDelete(id)
+    .then((response) => {
+      if (response) {
+        return discountDeletedMsg(
+          `Hello Admins, This ${name} discount expired`
+        );
+      } else {
+        return discountDeletedMsg("Something went wrong in discount expire");
+      }
+    })
+    .catch((err) => {
+      return discountDeletedMsg(req, res);
     });
 };
 

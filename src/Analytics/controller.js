@@ -110,19 +110,19 @@ function getAllMonthsInYear() {
   return months;
 }
 
-function getDateDifferent(startDate,endDate){
-  const date1 = moment(startDate).subtract(1, 'days');
+function getDateDifferent(startDate, endDate) {
+  const date1 = moment(startDate).subtract(1, "days");
   const date2 = moment(endDate);
-  console.log(date1,date2)
-  const count = date2.diff(date1, 'days');
+  console.log(date1, date2);
+  const count = date2.diff(date1, "days");
   const dateRange = [];
-let currentDate = date1.clone(); // Start with a copy of the start date
+  let currentDate = date1.clone(); // Start with a copy of the start date
 
-while (currentDate.isSameOrBefore(date2)) {
-  dateRange.push(currentDate.format('DD-MM-YYYY'));
-  currentDate.add(1, 'days');
-}
-console.log(dateRange)
+  while (currentDate.isSameOrBefore(date2)) {
+    dateRange.push(currentDate.format("DD-MM-YYYY"));
+    currentDate.add(1, "days");
+  }
+  console.log(dateRange);
   switch (true) {
     case count <= 7:
       console.log("last 7 days");
@@ -144,6 +144,36 @@ console.log(dateRange)
       console.log("Number doesn't fall into any specified range");
   }
 }
+
+//Get Todays New Orders
+
+const getTodayNewOrders = async () => {
+  const today = new Date();
+  const startOfToday = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate() - 1,
+    23,
+    59,
+    59
+  );
+  const endOfToday = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+    23,
+    59,
+    59
+  );
+  console.log(startOfToday, endOfToday);
+  let query1 = {
+    dateOrdered: { $gte: startOfToday, $lt: endOfToday },
+  };
+  const NewOrders = await Order.find(query1);
+
+  return await NewOrders.length;
+};
+
 const adminAnalytics = async (req, res) => {
   try {
     //dateOrdered
@@ -277,7 +307,7 @@ const adminAnalytics = async (req, res) => {
       };
     }
     orders = await Order.find(query);
-    // console.log("orders",orders)
+    // console.log("orders", orders);
     let shipment = orders.filter((x) => x.status === "SHIPMENT");
     let pending = orders.filter((x) => x.status === "PENDING");
     let inprocess = orders.filter((x) => x.status === "PROCESSING");
@@ -286,7 +316,7 @@ const adminAnalytics = async (req, res) => {
     let ordersInprocess = inprocess.length;
     let totalOrdersSeller = orders.length;
     let shipmentCount = shipment.length;
-    let totalAmount = orders.reduce((a, b) => a + b["amountPaid"], 0)
+    let totalAmount = orders.reduce((a, b) => a + b["amountPaid"], 0);
     let totalProducts = await Products.find({
       productOwner: req.params.id,
     }).count();
@@ -354,18 +384,16 @@ const adminAnalytics = async (req, res) => {
     ];
     //get income by month and year
     let incomeList = orders;
-    list.incomeData = await getIncomeData(
-      incomeList,
-      req.body.type,
-      req.body
-    );
+    list.incomeData = await getIncomeData(incomeList, req.body.type, req.body);
     list.analytics = totalAnalytics;
     return res
       .status(200)
       .send({ success: true, message: "", data: list, body: req.body });
   } catch (error) {
     console.log(error.message);
-    return res.status(400).send({ success: false, message: "Bad request",error:error });
+    return res
+      .status(400)
+      .send({ success: false, message: "Bad request", error: error });
   }
 };
 
@@ -382,8 +410,7 @@ function getIncomeData(orders, type, body) {
       moment().format("DD-MM-YYYY"),
     ];
   } else if (type == "date") {
-    
-    list = getDateDifferent(body.from,body.to);
+    list = getDateDifferent(body.from, body.to);
   } else if (type == "today") {
     list = [moment().format("DD-MM-YYYY")];
   } else if (type == "yesterday") {
@@ -427,7 +454,7 @@ function getIncomeData(orders, type, body) {
         filteredData = totalOrderData.filter(
           (x) => moment(x.dateOrdered).format("DD-MM-YYYY") == item
         );
-        console.log(totalOrderData)
+        console.log(totalOrderData);
       } else if (type == "today") {
         filteredData = totalOrderData.filter(
           (x) => moment(x.dateOrdered).format("DD-MM-YYYY") == item
@@ -437,16 +464,13 @@ function getIncomeData(orders, type, body) {
           (x) => moment(x.dateOrdered).format("DD-MM-YYYY") == item
         );
       } else if (type == "this_month") {
-        filteredData = totalOrderData.filter(
-          (x) =>
-          moment(x.dateOrdered).isBetween(item.start, item.end, null, "[]") 
-          );
-        console.log("filteredData",filteredData)
+        filteredData = totalOrderData.filter((x) =>
+          moment(x.dateOrdered).isBetween(item.start, item.end, null, "[]")
+        );
+        console.log("filteredData", filteredData);
       } else if (type == "last_month") {
-        filteredData = totalOrderData.filter(
-          (x) =>
-          moment(x.dateOrdered).isBetween(item.start, item.end, null, "[]") 
-
+        filteredData = totalOrderData.filter((x) =>
+          moment(x.dateOrdered).isBetween(item.start, item.end, null, "[]")
         );
       } else if (type == "last_three_month") {
         filteredData = totalOrderData.filter((x) =>
@@ -599,4 +623,5 @@ module.exports = {
   adminAnalytics,
   getSellerList,
   getSellerEarningAnalytics,
+  getTodayNewOrders,
 };
