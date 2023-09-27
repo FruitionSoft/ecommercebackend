@@ -7,32 +7,7 @@ const currentDate = moment();
 
 const getDiscount = async (req, res) => {
   let DiscountList;
-  console.log("active", req.query.active, "Category", req.query.category);
-
-  switch (req.query.active) {
-    case "ACTIVE":
-      if (req.query.category === "true") {
-        DiscountList = await Discount.find({ status: "ACTIVE" }).populate(
-          "category"
-        );
-      } else {
-        DiscountList = await Discount.find({ status: "ACTIVE" });
-      }
-      break;
-    case "DEACTIVE":
-      if (req.query.category === "true") {
-        DiscountList = await Discount.find({ status: "DEACTIVE" }).populate(
-          "category"
-        );
-      } else {
-        DiscountList = await Discount.find({ status: "DEACTIVE" });
-      }
-      break;
-    default:
-      DiscountList = await Discount.find({ status: "ACTIVE" });
-      break;
-  }
-
+  DiscountList = await Discount.find();
   if (await DiscountList) {
     res.status(200).send({ success: true, message: "", data: DiscountList });
   } else {
