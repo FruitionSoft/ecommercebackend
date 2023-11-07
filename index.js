@@ -165,6 +165,7 @@ const {
   updateFundDetail,
   getPendingFundData,
 } = require("./src/Funds/controller");
+const sendNotification = require('./services/Push Notification/notification')
 const schedule = require("node-schedule");
 const currentDate = moment();
 //CRON JOB for daily report
@@ -253,6 +254,9 @@ app.use(errorHandler);
 app.use(cors());
 app.options("*", cors());
 //API connections
+
+//send Notification
+app.post(`${API}/sendnotification`,sendNotification);
 
 //Login
 app.get(`${API}/sendmail`, sendMail);
@@ -418,8 +422,7 @@ app.put(`${API}/seller/fund/:id`, updateFundDetail);
 app.get(`${API}/seller/fundpending`, getPendingFundData);
 
 // Customer API's
-mongoose
-  .connect(process.env.CONNECTION, {
+mongoose.connect(process.env.CONNECTION, {
     useNewUrlParser: true,
   })
   .then(() => {

@@ -1,77 +1,224 @@
-const { AddressData } = require('./model');
-const mongoose =require("mongoose")
-const CITY_LIST = require("../../utils/indianCityList");
+const { AddressData } = require("./model");
+const mongoose = require("mongoose");
+const IndianCity = require("../../utils/indianCityList");
+const responseHandler = require("../../utils/utils");
 
-const addaddr = async(req, res) => {
-        const addr = new AddressData(req.body);
-        await addr.save().then(response => {
-            res.status(201).send({success: true, message: 'Data saved.'})
-        }).catch(err => {
-            res.status(500).send({success: false, message: '', error: err})
-        })
-}
+const addaddr = async (req, res) => {
+  console.log(Object.keys(req.body).length);
+  if (Object.keys(req.body).length === 0) {
+    responseHandler(
+      res,
+      400,
+      (data = false),
+      (customResponse = false),
+      "Request body is missing or empty"
+    );
+  } else {
+    const addr = new AddressData(req.body);
 
-const addrList = async(req, res) => {
-    const addrList = await AddressData.find({userId: req.params.id});
-    if(!addrList) {
-        res.status(500).send({success: false, message: 'No data found!'})
-    }else {
-        res.status(200).send({success: true, message: '', data: addrList});
-    }
-}
+    await addr
+      .save()
+      .then((response) => {
+        responseHandler(
+          res,
+          201,
+          (data = false),
+          (customResponse = false),
+          (message = false)
+        );
+      })
+      .catch((err) => {
+        responseHandler(
+          res,
+          400,
+          (data = false),
+          (customResponse = false),
+          (message = false),
+          (err = err)
+        );
+      });
+  }
+};
 
-const addrById = async(req, res) => {
-    const addrList = await AddressData.find({_id: req.params.id});
-    if(!addrList) {
-        res.status(404).send({success: false, message: 'No data found!'})
-    }else {
-        res.status(200).send({success: true, message: '', data: addrList[0]});
-    }
-}
+const addrList = async (req, res) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    responseHandler(
+      res,
+      400,
+      (data = false),
+      (customResponse = false),
+      "Please Check request params id is Valid"
+    );
+  } else {
+    await AddressData.find({ userId: req.params.id })
+      .then((response) => {
+        responseHandler(
+          res,
+          200,
+          (data = response),
+          (customResponse = false),
+          (message = false)
+        );
+      })
+      .catch((err) => {
+        responseHandler(
+          res,
+          500,
+          (data = false),
+          (customResponse = false),
+          (message = false),
+          (err = err)
+        );
+      });
+  }
+};
+
+const addrById = async (req, res) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    responseHandler(
+      res,
+      400,
+      (data = false),
+      (customResponse = false),
+      "Please Check request params id is Valid"
+    );
+  } else {
+    await AddressData.find({ _id: req.params.id })
+      .then((response) => {
+        if (response.length === 0) {
+          return responseHandler(
+            res,
+            NOTFOUND,
+            (data = false),
+            (customResponse = false),
+            (message = false),
+            (err = false)
+          );
+        } else {
+          responseHandler(
+            res,
+            200,
+            (data = response),
+            (customResponse = false),
+            (message = false)
+          );
+        }
+      })
+      .catch((err) => {
+        responseHandler(
+          res,
+          500,
+          (data = false),
+          (customResponse = false),
+          (message = false),
+          (err = err)
+        );
+      });
+  }
+};
 
 const editAddress = async (req, res) => {
-    if (!mongoose.isValidObjectId(req.params.id)) {
-        return res.status(400).send({ error: 'Invalid address id', success: false })
-    }
-    await AddressData.findByIdAndUpdate(req.params.id, req.body ).then(response => {
-        return res.status(200).send({ success: true, message: 'Data updated.' });
-    }).catch(err => {
-        return res.status(500).send({ error: err, success: false })
-    })
-}
+  if (
+    !mongoose.isValidObjectId(req.params.id) ||
+    Object.keys(req.body).length === 0
+  ) {
+    responseHandler(
+      res,
+      400,
+      (data = false),
+      (customResponse = false),
+      `${
+        !mongoose.isValidObjectId(req.params.id)
+          ? "Please check this is Invalid params id"
+          : Object.keys(req.body).length === 0
+          ? "Request body data not found"
+          : "Something went wrong"
+      }`
+    );
+  } else {
+    await AddressData.findByIdAndUpdate(req.params.id, req.body)
+      .then((response) => {
+        responseHandler(
+          res,
+          200,
+          (data = response),
+          (customResponse = false),
+          (message = false)
+        );
+      })
+      .catch((err) => {
+        responseHandler(
+          res,
+          500,
+          (data = false),
+          (customResponse = false),
+          (message = false),
+          (err = err)
+        );
+      });
+  }
+};
 
-const deleteaddr = async(req, res) => {
-    var query = { '_id': req.params.id };
-    try {
-        if (!req.params.id) {
-          res.status(400).send({ success: false, status: 400, error: 'Bad Request', message: 'Need to pass address id' })
-        } else {
-            const deleteaddr = await AddressData.findByIdAndDelete(query);
-          res.send({ success: true, status: 200, message: 'address deleted successfully' })
-        }
-      } catch (error) {
-        res.status(500).send({ success: false, status: res.status, error: 'Bad Request', message: 'address deletion failed' })
-      }
-}
+const deleteaddr = async (req, res) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    responseHandler(
+      res,
+      400,
+      (data = false),
+      (customResponse = false),
+      "Please Check request params id is Valid"
+    );
+  } else {
+    await AddressData.findByIdAndDelete({ _id: req.params.id })
+      .then((response) => {
+        responseHandler(
+          res,
+          202,
+          (data = false),
+          (customResponse = false),
+          (message = false)
+        );
+      })
+      .catch((err) => {
+        responseHandler(
+          res,
+          500,
+          (data = false),
+          (customResponse = false),
+          (message = false),
+          (err = err)
+        );
+      });
+  }
+};
 
-const getCityState = async(req, res) => {
-    try {
-        let filterByPin = CITY_LIST.data.filter(x => x.Pincode === req.params.id);
-        if(filterByPin.length > 0) {
-            return res.status(200).send({ success: true, status: 200, data: filterByPin[0] });
-        }else {
-            return res.status(500).send({ success: false, status: 500, message: "ZIP code not found" });
-        }
-    } catch (error) {
-        return res.status(500).send({ success: false, status: res.status, error: 'Bad Request', message: 'address deletion failed' })
-      }
-}
-
+const getCityState = async (req, res) => {
+  let filterByPin = IndianCity.IndianCity.filter(
+    (x) => x.Pincode === req.params.id
+  );
+  if (filterByPin.length > 0) {
+    responseHandler(
+      res,
+      200,
+      (data = filterByPin[0]),
+      (customResponse = false),
+      (message = false)
+    );
+  } else {
+    responseHandler(
+      res,
+      404,
+      (data = false),
+      (customResponse = false),
+      "ZIP code not found"
+    );
+  }
+};
 module.exports = {
-    addaddr,
-    addrList,
-    deleteaddr,
-    editAddress,
-    addrById,
-    getCityState
-}
+  addaddr,
+  addrList,
+  deleteaddr,
+  editAddress,
+  addrById,
+  getCityState,
+};

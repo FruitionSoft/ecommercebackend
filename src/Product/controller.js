@@ -57,7 +57,7 @@ const getProductList = async (req, res) => {
 };
 
 const getPendingStatusProductList = async (req, res) => {
-  const selectedFields = "name price image category";
+  const selectedFields = "name price image category ";
   const ProductList = await Products.find({ status: "PENDING" }).select(
     selectedFields
   );
