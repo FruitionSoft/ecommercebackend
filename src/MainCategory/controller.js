@@ -26,6 +26,7 @@ const getMainCategoryList = async (req, res) => {
 };
 
 const editMainCategory = async (req, res) => {
+  console.log();
   if (!mongoose.isValidObjectId(req.params.id)) {
     return res
       .status(500)

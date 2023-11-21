@@ -254,7 +254,6 @@ const addNumbers = (a, b) => {
 };
 
 const newOrder = async (req, res) => {
-  console.log("hi");
   try {
     let output = [];
     let orderItemList = [];
@@ -277,7 +276,6 @@ const newOrder = async (req, res) => {
         const res = await Product.find({ _id: item.productId });
         const weight = res[0].weight * item.quantity;
         totalWeight.push(weight);
-        console.log(totalWeight);
         const result = res[0].price * item.quantity;
         totalPrice.push(result);
       })
@@ -291,12 +289,10 @@ const newOrder = async (req, res) => {
       (accumulator, currentValue) => accumulator + currentValue,
       0
     );
-    console.log(overallWeight);
     let ordersCount = await Order.find().count();
     const orderId = `#ORDHNDMDANDR${moment().format("DDMMYY")}${(
       "000" + ordersCount
     ).slice(-4)}`;
-    // console.log(orderItemList)
     const newOrder = new Order({
       orderItems: orderItemList,
       addressId: req.body.addressId,

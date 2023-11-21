@@ -16,7 +16,6 @@ const getDiscount = async (req, res) => {
 };
 
 const NewDiscount = async (req, res) => {
-  console.log(req.body);
   const discountList = new Discount(req.body);
   discountList
     .save()
@@ -90,7 +89,6 @@ const deleteDiscount = async (req, res) => {
 
 const deleteDiscountCron = async (id, name) => {
   const { discountDeletedMsg } = mail;
-  console.log(id, name);
   await Discount.findByIdAndDelete(id)
     .then((response) => {
       if (response) {
