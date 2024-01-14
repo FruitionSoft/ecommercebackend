@@ -55,7 +55,9 @@ const getPaytmToken = (body, callback) => {
 
         post_req.write(post_data);
         post_req.end();
-    });
+    }).catch(error => {
+        console.log("error dude: ", error)
+    })
 }
 
 module.exports = { getPaytmToken }
